@@ -1,5 +1,10 @@
 # Architecture and review notes
 
+This document describes the existing workspace/image proof of concept. The
+proposed multi-user Torii platform is specified separately in the
+[platform planning package](platform/README.md). Its proposed architecture is
+not implemented by the current Compose stack.
+
 ## Purpose and boundary
 
 This repository is a portable proof of concept, not a production-approved

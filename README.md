@@ -5,6 +5,20 @@ platform. This repository currently contains its working AutoML workshop
 foundation; the unified UI and object-management API are not implemented yet.
 The repository is https://github.com/satanisz/torii.
 
+## Enterprise platform planning — spec first
+
+The target is a multi-user corporate platform, not a single-user application.
+The [platform planning package](docs/platform/README.md) describes requirements,
+the object/version/run model, architecture, security, Git integration and phased
+acceptance criteria. It is a draft for review, not implemented functionality.
+The [sprint plan](docs/platform/sprint-plan.md) combines infrastructure, backend
+and frontend work, with detailed cards for the first three iterations. The
+[brand reference](docs/brand/README.md) preserves the user-provided Torii logo.
+All behavior changes follow [Spec Driven Development](docs/platform/spec-driven-development.md)
+and the repository's [contributor/agent rules](AGENTS.md). The first
+[project and object-version specification](specs/0001-project-object-version/README.md)
+is not yet approved for implementation.
+
 **Upgrading an existing installation?** Read
 [the Torii rename and Docker migration guide](docs/torii-migration.md) before
 starting Compose. A new `torii` Compose project uses new volumes by default;
@@ -227,9 +241,12 @@ reference validation, version `3` was `READY` and assigned alias `candidate`.
 | Schema Registry | Schemas for Kafka metadata events |
 | Docker workspace volume | Notebooks, source code and reports in `/workspace` |
 
-Transformations do not need a separate database. The Torii Python pipeline
+In this local demonstration, transformations do not have a separate metadata
+service. The Torii Python pipeline
 performs them, stores the resulting dataset and manifest in MinIO, logs the data
 reference in MLflow, and publishes the data relationship to DataHub.
+The planned platform will manage transformation definitions, versions and
+executions explicitly; see the [domain model](docs/platform/domain-model.md).
 
 Open JupyterLab, then execute the end-to-end data validation, transformation,
 AutoML, registry, batch-inference and catalog pipeline in a Jupyter terminal:
