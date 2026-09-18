@@ -1,0 +1,22 @@
+# Optional migration override. Set each name from `docker volume ls` first.
+# External volumes must already exist: a typo fails instead of creating an
+# empty replacement. Do not run the old and new stacks against them together.
+volumes:
+  torii-postgres:
+    external: true
+    name: ${TORII_LEGACY_POSTGRES_VOLUME:?Set the existing PostgreSQL volume name}
+  torii-minio:
+    external: true
+    name: ${TORII_LEGACY_MINIO_VOLUME:?Set the existing MinIO volume name}
+  torii-workspace:
+    external: true
+    name: ${TORII_LEGACY_WORKSPACE_VOLUME:?Set the existing workspace volume name}
+  torii-datahub-kafka:
+    external: true
+    name: ${TORII_LEGACY_KAFKA_VOLUME:?Set the existing Kafka volume name}
+  torii-datahub-mysql:
+    external: true
+    name: ${TORII_LEGACY_MYSQL_VOLUME:?Set the existing MySQL volume name}
+  torii-datahub-opensearch:
+    external: true
+    name: ${TORII_LEGACY_OPENSEARCH_VOLUME:?Set the existing OpenSearch volume name}

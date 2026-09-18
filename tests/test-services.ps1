@@ -1,11 +1,11 @@
 [CmdletBinding()]
 param(
-    [string]$Image = 'automl/workspace:py3.12-vanilla'
+    [string]$Image = 'torii/workspace:py3.12-vanilla'
 )
 
 $ErrorActionPreference = 'Stop'
-$jupyterContainer = 'automl-test-jupyter'
-$codeContainer = 'automl-test-code-server'
+$jupyterContainer = 'torii-test-jupyter'
+$codeContainer = 'torii-test-code-server'
 $containerNames = $jupyterContainer, $codeContainer
 
 $existing = docker ps -a --format '{{.Names}}'

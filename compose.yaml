@@ -1,6 +1,8 @@
+name: torii
+
 services:
   workspace:
-    image: automl/workspace:py${PYTHON_VERSION:-3.12}-${PROFILE:-ml-standard}
+    image: torii/workspace:py${PYTHON_VERSION:-3.12}-${PROFILE:-ml-standard}
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -8,13 +10,14 @@ services:
         PYTHON_VERSION: ${PYTHON_VERSION:-3.12}
         PROFILE: ${PROFILE:-ml-standard}
     environment:
+      SCAFFOLD_VERSION: "3"
       WORKSPACE_IDE: ${WORKSPACE_IDE:-jupyter}
       WORKSPACE_AUTH_MODE: ${WORKSPACE_AUTH_MODE:-auto}
     ports:
       - "8888:8888"
       - "8080:8080"
     volumes:
-      - automl-workspace:/workspace
+      - torii-workspace:/workspace
 
 volumes:
-  automl-workspace:
+  torii-workspace:

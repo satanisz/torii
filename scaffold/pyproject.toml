@@ -1,7 +1,7 @@
 [project]
-name = "automl-project"
+name = "torii-project"
 version = "0.1.0"
-description = "AutoML model project"
+description = "Torii model project"
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = []

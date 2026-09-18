@@ -3,6 +3,6 @@ services:
     environment:
       WORKSPACE_IDE: code-server
       WORKSPACE_AUTH_MODE: password
-      PASSWORD: ${PASSWORD:-automl-local-dev}
+      PASSWORD: ${PASSWORD:-torii-local-dev}
     ports:
       - "8080:8080"

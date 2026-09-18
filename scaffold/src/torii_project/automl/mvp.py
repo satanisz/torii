@@ -20,10 +20,12 @@ from pandera import Check
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 
-from automl_project.config import PROJECT_ROOT, REPORTS_DIR
+from torii_project.config import PROJECT_ROOT, REPORTS_DIR
 
-EXPERIMENT_NAME = "automl-end-to-end-mvp"
-REGISTERED_MODEL_NAME = "automl-breast-cancer-classifier"
+EXPERIMENT_NAME = os.getenv("TORII_EXPERIMENT_NAME", "automl-end-to-end-mvp")
+REGISTERED_MODEL_NAME = os.getenv(
+    "TORII_REGISTERED_MODEL_NAME", "automl-breast-cancer-classifier"
+)
 TARGET = "is_benign"
 ROW_ID = "row_id"
 
@@ -39,7 +41,7 @@ def _s3_client():
 
 
 def _upload_bytes(key: str, content: bytes, content_type: str) -> str:
-    bucket = os.getenv("AUTOML_DATA_BUCKET", "automl-data")
+    bucket = os.getenv("TORII_DATA_BUCKET", os.getenv("AUTOML_DATA_BUCKET", "automl-data"))
     _s3_client().put_object(Bucket=bucket, Key=key, Body=content, ContentType=content_type)
     return f"s3://{bucket}/{key}"
 
@@ -121,7 +123,7 @@ def train_and_register(
     from autogluon.tabular import TabularPredictor
     from mlflow.models import infer_signature
 
-    from automl_project.automl.pyfunc import AutoGluonPyFuncModel
+    from torii_project.automl.pyfunc import AutoGluonPyFuncModel
 
     modelling_data = processed.drop(columns=[ROW_ID])
     train_data, test_data = train_test_split(
@@ -169,7 +171,9 @@ def train_and_register(
                 {
                     "python": platform.python_version(),
                     "autogluon_tabular": version("autogluon.tabular"),
-                    "image_profile": os.getenv("AUTOML_PROFILE", "automl-tabular"),
+                    "image_profile": os.getenv(
+                        "TORII_PROFILE", os.getenv("AUTOML_PROFILE", "automl-tabular")
+                    ),
                 },
                 "environment.json",
             )
@@ -256,7 +260,7 @@ def run_mvp(time_limit: int = 120, preset: str = "medium_quality", catalog: bool
     training = train_and_register(processed, manifest, time_limit=time_limit, preset=preset)
     predictions_uri = run_batch_inference(processed, training)
     if catalog:
-        from automl_project.automl.catalog import ingest_catalog, publish_lineage
+        from torii_project.automl.catalog import ingest_catalog, publish_lineage
 
         publish_lineage(
             raw_uri=str(manifest["raw_uri"]),

@@ -5,9 +5,9 @@ source:
     path_specs:
       # No {table} token: DataHub creates a file-level dataset whose name is
       # the full S3 URI also logged by MLflow and used by explicit lineage.
-      - include: "s3://automl-data/raw/breast-cancer/*/*.csv"
-      - include: "s3://automl-data/processed/breast-cancer/*/*.parquet"
-      - include: "s3://automl-data/predictions/breast-cancer/*/*.parquet"
+      - include: "s3://${TORII_DATA_BUCKET}/raw/breast-cancer/*/*.csv"
+      - include: "s3://${TORII_DATA_BUCKET}/processed/breast-cancer/*/*.parquet"
+      - include: "s3://${TORII_DATA_BUCKET}/predictions/breast-cancer/*/*.parquet"
     aws_config:
       aws_access_key_id: ${AWS_ACCESS_KEY_ID}
       aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}

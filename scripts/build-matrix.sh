@@ -3,7 +3,7 @@ set -euo pipefail
 
 python_version="${PYTHON_VERSION:-3.12}"
 profile="${PROFILE:-ml-standard}"
-image_repository="${IMAGE_REPOSITORY:-automl/workspace}"
+image_repository="${IMAGE_REPOSITORY:-torii/workspace}"
 
 if [[ "${1:-}" == "--all" ]]; then
   python_versions=(3.9 3.10 3.11 3.12)

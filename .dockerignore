@@ -2,10 +2,16 @@
 .github
 .idea
 .vscode
+.env
+.env.*
+.venv
+**/.ruff_cache
+**/.pytest_cache
 **/__pycache__
 *.py[cod]
 *.log
 docs
 automl-workspace-mvp-handoff.zip
+torii-workspace-mvp-handoff.zip
 k8s
 tests

@@ -6,7 +6,7 @@ param(
     [ValidateSet('vanilla', 'ml-standard', 'ml-max', 'automl-tabular')]
     [string]$Profile = 'ml-standard',
 
-    [string]$ImageRepository = 'automl/workspace',
+    [string]$ImageRepository = 'torii/workspace',
 
     [switch]$All,
 

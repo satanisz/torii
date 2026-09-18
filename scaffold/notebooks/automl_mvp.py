@@ -1,7 +1,7 @@
 # %%
 # End-to-end MVP. Run this cell and inspect the returned links/identifiers in
 # MLflow, MinIO and DataHub. Reusable logic lives in src, not in the notebook.
-from automl_project.automl.mvp import run_mvp
+from torii_project.automl.mvp import REGISTERED_MODEL_NAME, run_mvp
 
 # %%
 result = run_mvp(time_limit=120, preset="medium_quality")
@@ -12,6 +12,6 @@ result  # noqa: B018 - displayed by Jupyter/VS Code Interactive
 import mlflow.pyfunc
 
 model = mlflow.pyfunc.load_model(
-    "models:/automl-breast-cancer-classifier@candidate"
+    f"models:/{REGISTERED_MODEL_NAME}@candidate"
 )
 model  # noqa: B018 - displayed by Jupyter/VS Code Interactive

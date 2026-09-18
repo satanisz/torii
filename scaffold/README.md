@@ -1,6 +1,6 @@
-# AutoML project
+# Torii project
 
-This workspace was initialized from the AutoML project scaffold. Replace this
+This workspace was initialized from the Torii project scaffold. Replace this
 text with the purpose, owner, data sources and validation rules of your model.
 
 ## Suggested workflow

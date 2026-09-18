@@ -1,5 +1,5 @@
 variable "REGISTRY" {
-  default = "automl"
+  default = "torii"
 }
 
 variable "IMAGE_NAME" {

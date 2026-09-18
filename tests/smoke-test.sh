@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-image="${1:-automl/workspace:py3.12-ml-standard}"
+image="${1:-torii/workspace:py3.12-ml-standard}"
 
 docker run --rm \
   --env WORKSPACE_IDE=shell \
@@ -12,8 +12,8 @@ docker run --rm \
     jupyter lab --version
     code-server --version
     test -f /workspace/.automl-scaffold-version
-    python -c "import automl_project" 2>/dev/null || PYTHONPATH=/workspace/src python -c "import automl_project"
-    case "${AUTOML_PROFILE}" in
+    python -c "import torii_project" 2>/dev/null || PYTHONPATH=/workspace/src python -c "import torii_project"
+    case "${TORII_PROFILE}" in
       vanilla)
         ;;
       ml-standard)
@@ -28,7 +28,7 @@ docker run --rm \
         python -c "import autogluon, mlflow; from autogluon.tabular import TabularPredictor"
         ;;
       *)
-        echo "Unknown AUTOML_PROFILE: ${AUTOML_PROFILE}" >&2
+        echo "Unknown TORII_PROFILE: ${TORII_PROFILE}" >&2
         exit 1
         ;;
     esac

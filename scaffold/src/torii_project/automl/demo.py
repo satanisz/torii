@@ -1,8 +1,9 @@
-"""A reproducible tabular AutoML demonstration for AutoML workspaces."""
+"""A reproducible tabular AutoML demonstration for Torii workspaces."""
 
 from __future__ import annotations
 
 import json
+import os
 import platform
 import sys
 import tempfile
@@ -17,12 +18,13 @@ from mlflow.models import infer_signature
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 
-from automl_project.automl.pyfunc import AutoGluonPyFuncModel
-from automl_project.config import RAW_DATA_DIR, REPORTS_DIR
+from torii_project.automl.pyfunc import AutoGluonPyFuncModel
+from torii_project.config import RAW_DATA_DIR, REPORTS_DIR
 
-
-EXPERIMENT_NAME = "automl-demo"
-REGISTERED_MODEL_NAME = "automl-breast-cancer-classifier"
+EXPERIMENT_NAME = os.getenv("TORII_DEMO_EXPERIMENT_NAME", "automl-demo")
+REGISTERED_MODEL_NAME = os.getenv(
+    "TORII_REGISTERED_MODEL_NAME", "automl-breast-cancer-classifier"
+)
 DATASET_SOURCE = "sklearn.datasets.load_breast_cancer"
 
 

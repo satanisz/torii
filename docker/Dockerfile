@@ -37,6 +37,7 @@ COPY docker/requirements/ /tmp/requirements/
 COPY docker/constraints/ /tmp/constraints/
 
 RUN set -eux; \
+    sed -i 's/\r$//' /tmp/requirements/*.txt /tmp/constraints/*.txt; \
     test -f "/tmp/requirements/${PROFILE}.txt"; \
     uv venv "${VIRTUAL_ENV}"; \
     grep -E '^(torch|torchvision|torchaudio)([<>=!~].*)?$' "/tmp/requirements/${PROFILE}.txt" > /tmp/pytorch-requested.txt || true; \
@@ -88,10 +89,12 @@ ARG GROUP_ID=1001
 ENV DEBIAN_FRONTEND=noninteractive \
     VIRTUAL_ENV=/opt/venv \
     PATH=/opt/venv/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin \
-    HOME=/home/automl \
+    HOME=/home/torii \
     WORKSPACE_DIR=/workspace \
     WORKSPACE_IDE=jupyter \
     WORKSPACE_AUTH_MODE=auto \
+    TORII_PROFILE=${PROFILE} \
+    TORII_PYTHON=${PYTHON_VERSION} \
     AUTOML_PROFILE=${PROFILE} \
     AUTOML_PYTHON=${PYTHON_VERSION} \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -110,30 +113,30 @@ RUN apt-get update \
         procps \
         tini \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid "${GROUP_ID}" automl \
-    && useradd --uid "${USER_ID}" --gid automl --create-home --shell /bin/bash automl \
+    && groupadd --gid "${GROUP_ID}" torii \
+    && useradd --uid "${USER_ID}" --gid torii --create-home --shell /bin/bash torii \
     && printf '%s\n' \
         'export VIRTUAL_ENV=/opt/venv' \
         'export PATH="/opt/venv/bin:${PATH}"' \
-        > /etc/profile.d/automl-venv.sh \
-    && mkdir -p /workspace /opt/automl/scaffold \
-    && chown -R automl:automl /workspace /opt/automl /home/automl
+        > /etc/profile.d/torii-venv.sh \
+    && mkdir -p /workspace /opt/torii/scaffold \
+    && chown -R torii:torii /workspace /opt/torii /home/torii
 
 COPY --from=uv /uv /uvx /usr/local/bin/
-COPY --from=python-environment --chown=automl:automl /opt/venv /opt/venv
-COPY --from=python-environment --chown=automl:automl /opt/datahub-mlflow-venv /opt/datahub-mlflow-venv
+COPY --from=python-environment --chown=torii:torii /opt/venv /opt/venv
+COPY --from=python-environment --chown=torii:torii /opt/datahub-mlflow-venv /opt/datahub-mlflow-venv
 COPY --from=code-server /usr/bin/code-server /usr/bin/code-server
 COPY --from=code-server /usr/lib/code-server /usr/lib/code-server
-COPY --chown=automl:automl scaffold/ /opt/automl/scaffold/
+COPY --chown=torii:torii scaffold/ /opt/torii/scaffold/
 COPY --chmod=0755 docker/scripts/initialize-workspace.sh /usr/local/bin/initialize-workspace
 COPY --chmod=0755 docker/scripts/workspace-entrypoint.sh /usr/local/bin/workspace-entrypoint
 
-LABEL org.opencontainers.image.title="AutoML workspace" \
+LABEL org.opencontainers.image.title="Torii workspace" \
       org.opencontainers.image.description="Local-first Python ML workspace with JupyterLab, code-server and a safe project scaffold" \
-      io.automl.python="${PYTHON_VERSION}" \
-      io.automl.profile="${PROFILE}"
+      io.torii.python="${PYTHON_VERSION}" \
+      io.torii.profile="${PROFILE}"
 
-USER automl
+USER torii
 WORKDIR /workspace
 
 EXPOSE 8888 8080

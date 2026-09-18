@@ -1,4 +1,4 @@
-from automl_project.config import PROJECT_ROOT
+from torii_project.config import PROJECT_ROOT
 
 
 def test_project_root_contains_pyproject() -> None:

@@ -1,0 +1,5 @@
+# For an installation that only used compose.yaml (one workspace volume).
+volumes:
+  torii-workspace:
+    external: true
+    name: ${TORII_LEGACY_WORKSPACE_VOLUME:?Set the existing workspace volume name}

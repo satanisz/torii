@@ -1,3 +1,5 @@
+name: torii
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,7 +13,7 @@ services:
       timeout: 3s
       retries: 20
     volumes:
-      - automl-postgres:/var/lib/postgresql/data
+      - torii-postgres:/var/lib/postgresql/data
 
   minio:
     image: minio/minio:latest
@@ -23,19 +25,20 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - automl-minio:/data
+      - torii-minio:/data
 
   create-bucket:
     image: minio/mc:latest
     depends_on:
       - minio
     environment:
+      TORII_DATA_BUCKET: ${TORII_DATA_BUCKET:-automl-data}
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     entrypoint: >-
       /bin/sh -c 'until mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do sleep 1; done;
       mc mb --ignore-existing local/mlflow;
-      mc mb --ignore-existing local/automl-data'
+      mc mb --ignore-existing "local/$${TORII_DATA_BUCKET}"'
 
   mlflow:
     build:
@@ -67,7 +70,7 @@ services:
       retries: 20
 
   workspace:
-    image: automl/workspace:py3.12-automl-tabular
+    image: torii/workspace:py3.12-automl-tabular
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -83,20 +86,26 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       DATAHUB_GMS_URL: http://datahub-gms:8080
       DATAHUB_TELEMETRY_ENABLED: "false"
-      AUTOML_DATA_BUCKET: automl-data
+      TORII_DATA_BUCKET: ${TORII_DATA_BUCKET:-automl-data}
+      AUTOML_DATA_BUCKET: ${TORII_DATA_BUCKET:-automl-data}
+      FRAME_ML_DATA_BUCKET: ${TORII_DATA_BUCKET:-automl-data}
+      TORII_EXPERIMENT_NAME: ${TORII_EXPERIMENT_NAME:-automl-end-to-end-mvp}
+      TORII_DEMO_EXPERIMENT_NAME: ${TORII_DEMO_EXPERIMENT_NAME:-automl-demo}
+      TORII_REGISTERED_MODEL_NAME: ${TORII_REGISTERED_MODEL_NAME:-automl-breast-cancer-classifier}
+      FRAME_ML_PROFILE: automl-tabular
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       PYTHONPATH: /workspace/src
       S3_ENDPOINT_URL: http://minio:9000
-      SCAFFOLD_VERSION: "2"
+      SCAFFOLD_VERSION: "3"
       WORKSPACE_IDE: ${WORKSPACE_IDE:-jupyter}
       WORKSPACE_AUTH_MODE: ${WORKSPACE_AUTH_MODE:-token}
-      JUPYTER_TOKEN: ${JUPYTER_TOKEN:-automl-local-dev}
-      PASSWORD: ${PASSWORD:-automl-local-dev}
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN:-torii-local-dev}
+      PASSWORD: ${PASSWORD:-torii-local-dev}
     ports:
       - "8888:8888"
     volumes:
-      - automl-workspace:/workspace
+      - torii-workspace:/workspace
 
   # DataHub's local quickstart backend. These supporting services are kept on
   # the Compose network and are intentionally not exposed on the host.
@@ -121,7 +130,7 @@ services:
       start_period: 20s
     restart: on-failure
     volumes:
-      - automl-datahub-mysql:/var/lib/mysql
+      - torii-datahub-mysql:/var/lib/mysql
 
   search:
     image: opensearchproject/opensearch:2.19.3
@@ -138,7 +147,7 @@ services:
       retries: 12
       start_period: 60s
     volumes:
-      - automl-datahub-opensearch:/usr/share/opensearch/data
+      - torii-datahub-opensearch:/usr/share/opensearch/data
 
   broker:
     image: confluentinc/cp-kafka:8.2.2
@@ -178,7 +187,7 @@ services:
       retries: 12
       start_period: 60s
     volumes:
-      - automl-datahub-kafka:/var/lib/kafka/data
+      - torii-datahub-kafka:/var/lib/kafka/data
 
   schema-registry:
     image: confluentinc/cp-schema-registry:8.2.2
@@ -217,7 +226,7 @@ services:
       DATAHUB_GMS_PORT: "8080"
       DATAHUB_PRECREATE_TOPICS: "true"
       DATAHUB_SQL_SETUP_ENABLED: "true"
-      DATAHUB_TOKEN_SERVICE_SALT: automl-local-datahub-salt
+      DATAHUB_TOKEN_SERVICE_SALT: ${DATAHUB_TOKEN_SERVICE_SALT:-automl-local-datahub-salt}
       DATAHUB_TOKEN_SERVICE_SIGNING_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       EBEAN_DATASOURCE_DRIVER: com.mysql.jdbc.Driver
       EBEAN_DATASOURCE_HOST: mysql:3306
@@ -307,9 +316,9 @@ services:
       - "9002:9002"
 
 volumes:
-  automl-postgres:
-  automl-minio:
-  automl-workspace:
-  automl-datahub-kafka:
-  automl-datahub-mysql:
-  automl-datahub-opensearch:
+  torii-postgres:
+  torii-minio:
+  torii-workspace:
+  torii-datahub-kafka:
+  torii-datahub-mysql:
+  torii-datahub-opensearch:
