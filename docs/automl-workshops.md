@@ -1,4 +1,4 @@
-# AutoML Workshop Stack — scenariusze warsztatowe
+# Torii — AutoML Workshop Stack — scenariusze warsztatowe
 
 Ten materiał służy do praktycznego przejścia przez możliwości lokalnego stosu
 AutoML: od danych źródłowych, przez walidację i transformacje, po AutoML,
@@ -36,15 +36,15 @@ JupyterLab poleceniem `python`.
 Uruchom stos:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml up --build -d
-docker compose -f compose.automl-demo.yaml ps -a
+docker compose -f compose.demo.yaml up --build -d
+docker compose -f compose.demo.yaml ps -a
 ```
 
 Otwórz strony:
 
 | System | Adres | Dane lokalne |
 |---|---|---|
-| JupyterLab | <http://localhost:8888> | token `automl-local-dev` |
+| JupyterLab | <http://localhost:8888> | token `torii-local-dev` |
 | MLflow | <http://localhost:5000> | brak logowania |
 | MinIO | <http://localhost:9001> | `minioadmin` / `minioadmin` |
 | DataHub | <http://localhost:9002> | `datahub` / `datahub` |
@@ -73,7 +73,7 @@ Zrozumieć, która usługa odpowiada za obliczenia, a która przechowuje stan.
    workspace:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml restart workspace
+docker compose -f compose.demo.yaml restart workspace
 ```
 
 5. Po ponownym otwarciu JupyterLab sprawdź, czy plik nadal istnieje.
@@ -104,7 +104,7 @@ niezmienny identyfikator wersji.
 Uruchom w JupyterLab:
 
 ```python
-from automl_project.automl.mvp import prepare_data
+from torii_project.automl.mvp import prepare_data
 
 processed, manifest = prepare_data()
 manifest
@@ -242,7 +242,7 @@ AutoGluon.
 W terminalu JupyterLab uruchom krótszy przebieg:
 
 ```bash
-python -m automl_project.automl.mvp 60 --skip-catalog
+python -m torii_project.automl.mvp 60 --skip-catalog
 ```
 
 AutoGluon trenuje między innymi LightGBM, Random Forest, Extra Trees, CatBoost i
@@ -271,7 +271,7 @@ W MLflow otwórz eksperyment `automl-end-to-end-mvp` i przebieg
 Uruchom drugi przebieg z innym budżetem, na przykład 30 sekund:
 
 ```bash
-python -m automl_project.automl.mvp 30 --skip-catalog
+python -m torii_project.automl.mvp 30 --skip-catalog
 ```
 
 Zaznacz oba przebiegi w MLflow i wybierz porównanie. Oceń:
@@ -400,7 +400,7 @@ Zrestartuj kernel JupyterLab, a następnie wykonaj:
 ```python
 import mlflow.pyfunc
 
-from automl_project.automl.mvp import prepare_data
+from torii_project.automl.mvp import prepare_data
 
 MODEL_NAME = "automl-breast-cancer-classifier"
 processed, manifest = prepare_data()
@@ -441,7 +441,7 @@ powstał wynik?”.
 Jeżeli ostatni przebieg pomijał katalog, uruchom pełny scenariusz:
 
 ```bash
-python -m automl_project.automl.mvp 60
+python -m torii_project.automl.mvp 60
 ```
 
 W DataHub wyszukaj kolejno:
@@ -505,7 +505,7 @@ W JupyterLab wykonaj:
 import mlflow
 import mlflow.pyfunc
 
-from automl_project.automl.mvp import prepare_data
+from torii_project.automl.mvp import prepare_data
 
 MODEL_NAME = "automl-breast-cancer-classifier"
 processed, manifest = prepare_data()
@@ -574,14 +574,14 @@ całego przepływu.
 Zatrzymaj MLflow:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml stop mlflow
+docker compose -f compose.demo.yaml stop mlflow
 ```
 
 Spróbuj w JupyterLab pobrać alias modelu. Oczekiwany jest błąd połączenia, a nie
 ciche użycie lokalnej kopii. Przywróć usługę:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml start mlflow
+docker compose -f compose.demo.yaml start mlflow
 ```
 
 Sprawdź <http://localhost:5000/health>.
@@ -592,8 +592,8 @@ Zatrzymaj MinIO i wykonaj `prepare_data()`. Zapis snapshotu powinien zakończyć
 się błędem, więc trening nie powinien ruszyć dalej.
 
 ```powershell
-docker compose -f compose.automl-demo.yaml stop minio
-docker compose -f compose.automl-demo.yaml start minio
+docker compose -f compose.demo.yaml stop minio
+docker compose -f compose.demo.yaml start minio
 ```
 
 Po starcie MinIO odczekaj kilka sekund i ponów operację.
@@ -601,8 +601,8 @@ Po starcie MinIO odczekaj kilka sekund i ponów operację.
 ### Scenariusz C — restart całego stosu bez utraty danych
 
 ```powershell
-docker compose -f compose.automl-demo.yaml down
-docker compose -f compose.automl-demo.yaml up -d
+docker compose -f compose.demo.yaml down
+docker compose -f compose.demo.yaml up -d
 ```
 
 Po starcie potwierdź, że istnieją wcześniejsze:
@@ -617,7 +617,7 @@ Po starcie potwierdź, że istnieją wcześniejsze:
 Liczba rekordów MLflow w PostgreSQL:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml exec -T postgres `
+docker compose -f compose.demo.yaml exec -T postgres `
   psql -U mlflow -d mlflow -Atc `
   "select 'runs='||count(*) from runs union all select 'model_versions='||count(*) from model_versions;"
 ```
@@ -625,7 +625,7 @@ docker compose -f compose.automl-demo.yaml exec -T postgres `
 Liczba encji DataHub w MySQL:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml exec -T mysql `
+docker compose -f compose.demo.yaml exec -T mysql `
   mysql -uroot -pdatahub datahub -N -e `
   "select count(distinct urn) from metadata_aspect_v2;"
 ```
@@ -649,7 +649,7 @@ Uruchom pełny pipeline i przygotuj odpowiedzi bez zaglądania do pamięci proce
 treningowego:
 
 ```bash
-python -m automl_project.automl.mvp 60
+python -m torii_project.automl.mvp 60
 ```
 
 ### Lista dowodów
@@ -659,7 +659,7 @@ python -m automl_project.automl.mvp 60
 | Z jakiego źródła pochodzą dane? | manifest oraz DataHub |
 | Jaka dokładnie wersja danych była użyta? | URI i SHA-256 w MinIO/MLflow |
 | Jakie reguły jakości przeszły dane? | `data/manifest.json` w przebiegu MLflow |
-| Jakie transformacje wykonano? | manifest i kod `automl_project.automl.mvp` |
+| Jakie transformacje wykonano? | manifest i kod `torii_project.automl.mvp` |
 | Jakie algorytmy porównano? | leaderboard AutoGluon w MLflow |
 | Jakie były parametry i wersje bibliotek? | params oraz `environment.json` |
 | Który model został zaakceptowany? | wersja i alias w MLflow Registry |

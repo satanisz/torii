@@ -57,18 +57,20 @@ to `lckr-jupyterlab-variableinspector`.
 
 ## Workspace lifecycle
 
-The scaffold source lives at `/opt/automl/scaffold`, outside the persistent
+The scaffold source lives at `/opt/torii/scaffold`, outside the persistent
 workspace. Initialization is intentionally conservative:
 
-- marker present: do nothing;
+- marker present with the requested version: do nothing;
+- marker present with another explicitly requested version: add missing files
+  without overwriting user files;
 - workspace contains a user file: do nothing;
 - workspace is empty: copy the scaffold without replacement;
 - interrupted copy marker present: resume missing files, never replace files.
 
 This lets Kubernetes mount a new PVC at `/workspace` without hiding the template
-and protects an existing project from an image upgrade. Changing the scaffold in
-a newer image does not silently migrate existing workspaces; migration must be a
-separate, explicit operation.
+and protects an existing project from file replacement during an image upgrade.
+The requested `SCAFFOLD_VERSION` controls additive migration. Compose version `3`
+adds the Torii package; the historical marker filename remains compatible.
 
 ## Runtime and security defaults
 

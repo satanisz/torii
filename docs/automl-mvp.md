@@ -1,4 +1,4 @@
-# AutoML Workshop Stack
+# Torii — AutoML Workshop Stack
 
 Praktyczne ćwiczenia i scenariusze demonstracyjne znajdują się w
 [`automl-workshops.md`](automl-workshops.md).
@@ -15,7 +15,7 @@ registered model to batch predictions.
 | Development | JupyterLab or optional code-server | Interactive exploration with reusable pipeline code outside the notebook |
 | Data storage | MinIO | Immutable raw and processed snapshots, prediction outputs and MLflow artifacts |
 | Data validation | Pandera | Schema, null, uniqueness and target-domain checks before training |
-| Transformation | AutoML Python pipeline | Column normalization, deterministic deduplication and Parquet materialization |
+| Transformation | Torii Python pipeline | Column normalization, deterministic deduplication and Parquet materialization |
 | AutoML | AutoGluon Tabular | Time-bounded comparison and ensembling of trusted model families |
 | Tracking and registry | MLflow | Parameters, data reference, metrics, environment, artifacts, model version and `candidate` alias |
 | Catalog and lineage | DataHub | Searchable MinIO datasets, MLflow experiments/models and raw -> processed -> predictions lineage |
@@ -214,7 +214,7 @@ Desktop and wait until its engine status is **Running** before retrying.
 If Docker Desktop itself exits with `initializing Inference manager` and a
 `dockerInference` path error, Compose has not started yet. This is a reported
 [Docker Desktop for Windows startup bug](https://github.com/docker/desktop-feedback/issues/625),
-not a AutoML configuration error. Install a Docker Desktop release containing
+not a Torii configuration error. Install a Docker Desktop release containing
 the fix (or use a known working release); do not use **Reset to factory
 defaults** without backing up Docker volumes because it removes local stack
 state.
@@ -224,8 +224,8 @@ state.
 Run from the `docker-images-ml` directory:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml up --build -d
-docker compose -f compose.automl-demo.yaml ps
+docker compose -f compose.demo.yaml up --build -d
+docker compose -f compose.demo.yaml ps
 ```
 
 DataHub performs a one-time storage migration during the first start. Its UI
@@ -235,7 +235,7 @@ do not publish host ports.
 Follow startup if necessary:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml logs -f datahub-gms datahub-frontend
+docker compose -f compose.demo.yaml logs -f datahub-gms datahub-frontend
 ```
 
 ## Run the complete demo
@@ -243,15 +243,15 @@ docker compose -f compose.automl-demo.yaml logs -f datahub-gms datahub-frontend
 The quickest path is one command from PowerShell:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml exec workspace `
-  python -m automl_project.automl.mvp 120
+docker compose -f compose.demo.yaml exec workspace `
+  python -m torii_project.automl.mvp 120
 ```
 
 The number is the AutoGluon time budget in seconds. The same command can be run
 in a JupyterLab terminal without the `docker compose ... exec workspace` part:
 
 ```bash
-python -m automl_project.automl.mvp 120
+python -m torii_project.automl.mvp 120
 ```
 
 For a guided notebook version, open `notebooks/automl_mvp.py` in JupyterLab.
@@ -272,7 +272,7 @@ input and processed data reuse the same content-addressed MinIO paths.
 
 | Page | Address | Local credentials |
 |---|---|---|
-| JupyterLab | <http://localhost:8888> | token `automl-local-dev` |
+| JupyterLab | <http://localhost:8888> | token `torii-local-dev` |
 | MLflow | <http://localhost:5000> | none |
 | MinIO console | <http://localhost:9001> | `minioadmin` / `minioadmin` |
 | DataHub | <http://localhost:9002> | `datahub` / `datahub` |
@@ -328,28 +328,28 @@ client used for training; both still communicate through the server API.
 Check only the service state:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml ps
+docker compose -f compose.demo.yaml ps
 ```
 
 Stop containers while preserving all data:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml down
+docker compose -f compose.demo.yaml down
 ```
 
 Start them again with the same MLflow, MinIO, DataHub and workspace contents:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml up -d
+docker compose -f compose.demo.yaml up -d
 ```
 
 To use code-server instead of JupyterLab:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml -f compose.automl-vscode.yaml up --build -d
+docker compose -f compose.demo.yaml -f compose.vscode.yaml up --build -d
 ```
 
-Then open <http://localhost:8080> with password `automl-local-dev`.
+Then open <http://localhost:8080> with password `torii-local-dev`.
 
 Deleting volumes is intentionally not part of the normal workflow because it
 removes experiments, models, objects, catalog metadata and workspace files.

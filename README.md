@@ -1,6 +1,21 @@
-# AutoML workspace images
+# Torii
 
-Local-first proof of concept for reproducible Python and AutoML workspaces with
+Torii is the product name for the planned modular data, analytics and model
+platform. This repository currently contains its working AutoML workshop
+foundation; the unified UI and object-management API are not implemented yet.
+The repository is https://github.com/satanisz/torii.
+
+**Upgrading an existing installation?** Read
+[the Torii rename and Docker migration guide](docs/torii-migration.md) before
+starting Compose. A new `torii` Compose project uses new volumes by default;
+the optional migration override reuses explicitly selected existing volumes.
+
+On the migrated workstation, the ignored `.env` selects the demo and external
+volumes automatically. Use `docker compose up -d` / `docker compose ps` there;
+see [local installation](docs/local-installation.md). Explicit `-f` arguments
+override that selection and must include the legacy-volume override.
+
+The current foundation provides reproducible Python and AutoML workspaces with
 JupyterLab, code-server, `uv`, MLflow, PostgreSQL, MinIO and a data-science
 project scaffold. It uses only public images and package repositories, so it
 can be reviewed and built on a normal developer laptop before corporate
@@ -55,7 +70,7 @@ Equivalent direct command:
 docker build -f docker/Dockerfile \
   --build-arg PYTHON_VERSION=3.12 \
   --build-arg PROFILE=ml-standard \
-  -t automl/workspace:py3.12-ml-standard .
+  -t torii/workspace:py3.12-ml-standard .
 ```
 
 Build all 12 images sequentially on a normal laptop:
@@ -83,8 +98,8 @@ container log:
 
 ```bash
 docker run --rm -p 8888:8888 \
-  -v automl-workspace:/workspace \
-  automl/workspace:py3.12-ml-standard
+  -v torii-workspace:/workspace \
+  torii/workspace:py3.12-ml-standard
 ```
 
 code-server generates a one-time password and prints it in the log:
@@ -92,8 +107,8 @@ code-server generates a one-time password and prints it in the log:
 ```bash
 docker run --rm -p 8080:8080 \
   -e WORKSPACE_IDE=code-server \
-  -v automl-workspace:/workspace \
-  automl/workspace:py3.12-ml-standard
+  -v torii-workspace:/workspace \
+  torii/workspace:py3.12-ml-standard
 ```
 
 For a fixed local code-server password, also pass
@@ -109,12 +124,15 @@ docker compose up --build
 
 ## Safe scaffold initialization
 
-The template is stored read-only at `/opt/automl/scaffold`. On container start:
+The template is stored read-only at `/opt/torii/scaffold`. On container start:
 
 1. an empty `/workspace` receives the project structure;
-2. a non-empty `/workspace` is left untouched;
+2. a non-empty, unmarked `/workspace` is left untouched;
 3. a version marker makes later starts idempotent;
-4. an interrupted first copy is resumed without overwriting existing files.
+4. an interrupted first copy is resumed without overwriting existing files;
+5. an explicitly increased scaffold version adds missing files to a marked
+   workspace, preserving existing files. Compose uses version `3` to add the
+   `torii_project` package to older AutoML workspaces.
 
 The structure follows the useful ideas from Cookiecutter Data Science—separate
 raw/interim/processed data, notebooks, reusable `src`, models, reports and
@@ -139,13 +157,13 @@ separately. Project dependencies should normally be declared in the generated
 ```bash
 python scripts/generate-ml-max.py --check
 bash tests/test-scaffold.sh
-bash tests/smoke-test.sh automl/workspace:py3.12-ml-standard
+bash tests/smoke-test.sh torii/workspace:py3.12-ml-standard
 ```
 
 Windows service test:
 
 ```powershell
-.\tests\test-services.ps1 -Image automl/workspace:py3.12-vanilla
+.\tests\test-services.ps1 -Image torii/workspace:py3.12-vanilla
 ```
 
 See `docs/validation.md` for the local test report and `docs/architecture.md`
@@ -157,10 +175,10 @@ dependencies and Kubernetes.
 From this directory, start the complete local stack:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml up --build
+docker compose -f compose.demo.yaml up --build
 ```
 
-It starts a AutoML JupyterLab workspace, MLflow, PostgreSQL, MinIO and DataHub.
+It starts a Torii JupyterLab workspace, MLflow, PostgreSQL, MinIO and DataHub.
 The local DataHub backend also includes MySQL, OpenSearch, Kafka and Schema
 Registry; these supporting services are not exposed on host ports.
 
@@ -168,7 +186,7 @@ Registry; these supporting services are not exposed on host ports.
 
 | Service | Address | Local access |
 |---|---|---|
-| JupyterLab | <http://localhost:8888> | token `automl-local-dev` |
+| JupyterLab | <http://localhost:8888> | token `torii-local-dev` |
 | MLflow | <http://localhost:5000> | no login |
 | MinIO console | <http://localhost:9001> | `minioadmin` / `minioadmin` |
 | DataHub | <http://localhost:9002> | `datahub` / `datahub` |
@@ -209,7 +227,7 @@ reference validation, version `3` was `READY` and assigned alias `candidate`.
 | Schema Registry | Schemas for Kafka metadata events |
 | Docker workspace volume | Notebooks, source code and reports in `/workspace` |
 
-Transformations do not need a separate database. The AutoML Python pipeline
+Transformations do not need a separate database. The Torii Python pipeline
 performs them, stores the resulting dataset and manifest in MinIO, logs the data
 reference in MLflow, and publishes the data relationship to DataHub.
 
@@ -217,7 +235,7 @@ Open JupyterLab, then execute the end-to-end data validation, transformation,
 AutoML, registry, batch-inference and catalog pipeline in a Jupyter terminal:
 
 ```bash
-python -m automl_project.automl.mvp 120
+python -m torii_project.automl.mvp 120
 ```
 
 Open MLflow to inspect the run and registered `candidate` model, MinIO to inspect
@@ -230,10 +248,10 @@ The hands-on Polish workshop guide is available in
 
 To use the same workspace with code-server rather than JupyterLab, use the
 optional override and open `http://localhost:8080` with password
-`automl-local-dev`:
+`torii-local-dev`:
 
 ```powershell
-docker compose -f compose.automl-demo.yaml -f compose.automl-vscode.yaml up --build
+docker compose -f compose.demo.yaml -f compose.vscode.yaml up --build
 ```
 
 This is a local development stack only. Replace the default credentials before
