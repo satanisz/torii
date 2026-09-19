@@ -38,7 +38,11 @@ jobs:
       - name: Strict types and tests
         run: |
           uv run --frozen mypy
-          uv run --frozen pytest -q --cov
+          uv run --frozen pytest -q -m 'not integration' --cov
+      - name: SPEC-0001 B1 real PostgreSQL transactions
+        shell: pwsh
+        working-directory: .
+        run: ./deploy/platform/test-projects.ps1 -TestArgs @('tests/integration', '--cov', '--cov-append')
       - name: Known Python dependency vulnerabilities
         run: |
           uv export --frozen --no-dev --no-editable --no-emit-project --output-file .venv/runtime-requirements.txt --quiet
@@ -73,4 +77,6 @@ jobs:
           persist-credentials: false
       - name: Bounded lifecycle guards
         shell: pwsh
-        run: ./deploy/platform/test-tools.ps1
+        run: |
+          ./deploy/platform/test-tools.ps1
+          ./deploy/platform/test-b1-environment.ps1

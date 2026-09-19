@@ -1,9 +1,12 @@
 # SPEC-0001: projekty, uprawnienia i wersje definicji
 
-Status: **Accepted (delegated)**. Rewizja: 0.3 (semantyka; format OpenAPI 0.2.0).
+Status: **Accepted (delegated)**. Rewizja: 0.4 (semantyka; format OpenAPI 0.2.0).
 Data: 2026-09-19. Podstawa: [mandat użytkownika](../../docs/platform/delivery-mandate.md).
 Implementacja/testy runtime: do wykonania; brak statusu Verified.
 Kontrola schematów i przykładów jest osobnym dowodem specyfikacji, nie funkcji.
+
+Przyrost [B1](increment-b1.md): transakcje projektów bez endpointów HTTP.
+Rewizja 0.4 precyzuje zegar TTL receipt; nie zmienia schematu bazy ani wire.
 
 Wymagania: FR-01, FR-02, część FR-11/FR-12, NFR-01/04/07/08/09/10.
 ADR: [0001](../../adr/0001-platform-boundaries.md),

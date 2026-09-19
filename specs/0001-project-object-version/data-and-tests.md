@@ -55,7 +55,12 @@ Nie deduplikujemy pomiędzy projektami ani nie ujawniamy globalnego istnienia
 digestu. Ta sama definicja w różnych obiektach może mieć ten sam digest, ale
 inne ID i ACL. Brak mechanizmu „pobierz dowolną wersję tylko po hashu”.
 
-## Macierz testów runtime — wszystkie jeszcze niewykonane
+## Macierz testów runtime — zakres pełnego SPEC
+
+Pierwotna macierz obejmuje SP-01/02. Dowody części projektowej B1 znajdują się
+w [raporcie](../../docs/platform/sp-01-b1-evidence.md); pozostałe ścieżki
+HTTP/OIDC/obiektów/wersji/E2E/restore nadal nie są zaliczone. Nie traktować
+testów usługi projektowej jako ukończenia całego wiersza AC.
 
 | AC | Dokładny zakres dowodu | Warstwa |
 |---|---|---|

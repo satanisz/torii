@@ -29,6 +29,30 @@ transaction tests and OIDC/session integration before connecting the production
 HTTP routes. Tests must cover denial, last-owner race, idempotent replay under
 revoked grants, audit-failure rollback, lock timeout, restart and restore.
 
+### B1: project application service
+
+`application/projects.py` implements persisted project creation/reads, policy
+replacement, memberships and audit pages. `storage/receipts.py` and
+`storage/transactions.py` contain transactional receipts and safe failure
+boundaries; strict input validators remain in the dependency-free domain.
+Specification: `specs/0001-project-object-version/increment-b1.md`, accepted
+after independent technical review before implementation. Semantics rev0.4
+clarifies receipt TTL at the final database timestamp before commit.
+
+Writes use READ COMMITTED, scope locks and fresh permission checks after waiting.
+Read-only REPEATABLE READ keeps policy body/ETag consistent. No new HTTP route,
+identity bypass, migration or modification of the running legacy/new test stack.
+
+Run real PostgreSQL tests from repo root with
+`./deploy/platform/test-projects.ps1`, or the full local gate with
+`./scripts/check-platform-foundation.ps1 -IncludePostgres`. The harness creates
+new tmpfs-only PostgreSQL and a fresh migrated database per test; fixture seeding
+uses the migrator, all business operations use runtime. Ordinary pytest without
+the dedicated harness does not count skipped database tests as verification.
+
+B1 does not cover process/database restart, restore, HTTP/OIDC or UI journeys.
+See `docs/platform/sp-01-b1-evidence.md` for executed evidence and remaining gates.
+
 ## Increment C: integrated journey
 
 Connect frontend and isolated Keycloak/DB stack, validate real multiple-user

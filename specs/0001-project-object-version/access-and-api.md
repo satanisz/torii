@@ -1,6 +1,6 @@
 # SPEC-0001 — tożsamość, prawa i semantyka API
 
-Rewizja 0.3, Accepted (delegated); podstawa w README. Kontrakt SP-01/02.
+Rewizja 0.4, Accepted (delegated); podstawa w README oraz przegląd B1. Kontrakt SP-01/02.
 Kontrakt maszynowy: [OpenAPI](contracts/openapi.json).
 Schemat treści definicji: [JSON Schema](contracts/definitions.schema.json).
 
@@ -134,7 +134,9 @@ dostarczonego przez klienta nagłówka jako zaufanego ID.
   latest_version_id oznacza wersję o najwyższym numerze, nie ostatnio zwrócony
   receipt; finalizacja wcześniejszego identycznego payloadu nie cofa tego wskaźnika.
 - POST projektu/obiektu, finalizacja, archive i zmiany członkostw wymagają
-  `Idempotency-Key`: UUIDv4. Klucz żyje 24 h od commit; zakres = principal,
+  `Idempotency-Key`: UUIDv4. Klucz żyje 24 h od czasu bazy (`clock_timestamp`)
+  przy końcowym zapisie receipt bezpośrednio przed commit, skuteczny tylko po
+  commit; zakres = principal,
   operacja i projekt (organizacja przy create project).
 - Fingerprint obejmuje metodę, kanoniczną ścieżkę, If-Match i JCS body
   (pusty body jako null). Ten sam klucz i inny fingerprint daje 409.
