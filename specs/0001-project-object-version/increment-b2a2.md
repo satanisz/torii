@@ -7,7 +7,8 @@ mandat użytkownika, nie akceptacja własna autora ani audyt ludzki.
 B2a1 pozostaje przyjętą warstwą persistence.
 Ten przyrost realizuje część B2-AC01 (SPEC-0001 AC-10/14), nie transport OIDC,
 cache/rotation online, callback, nowe HTTP routes, DB ani login E2E.
-Transport discovery/JWKS/code exchange będzie osobnym B2a3 przed B2b.
+Transport discovery/JWKS/cache ma osobny [B2a3](increment-b2a3.md),
+code exchange/revocation wymagają następnego B2a4 przed B2b.
 
 ## Profil i granica zaufania
 

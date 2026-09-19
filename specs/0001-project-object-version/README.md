@@ -16,6 +16,9 @@ Przyrost [B2a2](increment-b2a2.md): offline podpisy JWT, ścisłe claims i publi
 klucze, bez transportu OIDC, cache ani integracji logowania. D02 lokalnego profilu
 przyjęte po review exact-tag źródeł; nadal potrzebne realne Keycloak E2E.
 Dowód komponentu offline: [raport B2a2](../../docs/platform/sp-01-b2a2-evidence.md).
+Przyrost [B2a3](increment-b2a3.md): bounded GET discovery/JWKS i cache kluczy,
+przyjęty osobno po review. Code exchange/revocation wymagają B2a4; HTTP/login
+E2E i odbiór SP-01 nadal pozostają osobnymi bramkami.
 
 Wymagania: FR-01, FR-02, część FR-11/FR-12, NFR-01/04/07/08/09/10.
 ADR: [0001](../../adr/0001-platform-boundaries.md),
