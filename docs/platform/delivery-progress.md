@@ -16,8 +16,8 @@ bieżące dowody pierwszego przyrostu poniżej. Nie ma odbioru całego SP-01.
 
 ## SP-01 — pierwszy fundament (zweryfikowany w ograniczonym zakresie)
 
-Commit baseline/kontraktów/logo i mandatu: `7328e1c`. Kolejny commit integracyjny
-zapisze kod po domknięciu przeglądu. Nie cofamy baseline ani nie zmieniamy legacy.
+Commit baseline/kontraktów/logo i mandatu: `7328e1c`. Kod fundamentu:
+**`8051a85`**, po domknięciu przeglądu i bramek. Nie zmieniono legacy.
 
 - `apps/api`: osobny Python 3.12/FastAPI, frozen uv.lock, konfiguracja fail-closed,
   bezpieczna obwiednia HTTP, czyste reguły ról/ETag/JSON/cursorów, health i Alembic.
@@ -59,7 +59,7 @@ pakietów (`uv run --frozen --no-sync` w zbudowanym kontenerze).
 
 ### Następne obowiązkowe kroki
 
-1. Domknąć przegląd/gates tego fundamentu i commit; zapisać jego hash/dowody.
+1. Fundament zacommitowany i zweryfikowany — nie powtarzać jego implementacji.
 2. Increment B: repozytoria/transakcje projektów, membership, audit i receipt;
    OIDC code+PKCE/state/nonce z cookie inicjującej przeglądarki, sesje i Bearer.
    Brak żadnego hardcoded identity, bypass auth ani in-memory fallback.

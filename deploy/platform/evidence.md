@@ -1,7 +1,8 @@
 # SP01-02 — dowody infrastruktury
 
 2026-09-19. Status: scaffolding + częściowa integracja, **nie pełny odbiór AC**.
-Polecenia wykonano w working tree po `a7b19a5`; commit integracyjny dopisze root.
+Polecenia wykonano w working tree po `7328e1c`; commit integracyjny: `8051a85`.
+Root powtórzył testy topologii i gateway oraz sprawdził prawa runtime w bazie.
 Docker Desktop 28.5.2, Compose 2.40.3, Linux amd64, Windows PowerShell.
 
 ## Wykonane

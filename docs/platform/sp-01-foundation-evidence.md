@@ -1,7 +1,7 @@
 # SP-01 — evidence for the first foundation increment
 
-Date: 2026-09-19. Integration base: `7328e1c`; the implementation commit will
-be recorded after the reviewed changes are committed. **SP-01 remains open.**
+Date: 2026-09-19. Integration base: `7328e1c`; implementation commit:
+**`8051a85`**. **SP-01 remains open.**
 
 ## Scope and interpretation
 
@@ -92,3 +92,8 @@ Docker Desktop internal-network publish limitation and reviewed ingress bridge.
 Logo hashes match the unmodified original. Changed/new Markdown documents had
 valid local links when checked. Generated credentials, virtual environments and
 build outputs are ignored. This does not substitute for a full secret scanner.
+
+Before commit, staged text was checked against the actual newly generated local
+credential values: no matches. Root independently repeated all 26 topology and
+6 HTTPS gateway/log-redaction checks: PASS. The gateway test removed only its
+verified temporary containers/network; platform database volumes were retained.
