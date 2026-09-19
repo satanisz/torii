@@ -4,6 +4,11 @@ Data: 2026-09-19. Status: **baseline dopuszczony do lokalnej realizacji**.
 Zakres zgody: [mandat użytkownika](delivery-mandate.md), stan: [dziennik](delivery-progress.md).
 Punkt odniesienia kodu: `fbd4b1f` / `2f94f77` na `main`.
 
+**Do ręcznych testów:** działa osobny [lokalny demonstrator](../../apps/demo/README.md)
+SPEC-0018. [Prezentacja HTML](../presentation/torii.html) opisuje jego przepływ
+i zależności. Dalsza część tego dokumentu określa docelową platformę enterprise,
+nie listę gotowych funkcji demo. Bieżący stan jest w dzienniku powyżej.
+
 ## Cel produktu
 
 Torii ma umożliwiać zespołom korporacyjnym budowanie, współdzielenie,

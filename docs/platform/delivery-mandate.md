@@ -27,6 +27,10 @@ wdrożenie, rzeczywiste dane firmy ani zmianę/wykasowanie istniejących wolumen
 i root `.env`. Lokalny test nie zastępuje firmowego IdP, DR ani odbioru bezpieczeństwa.
 Nie instalujemy CA globalnie. Nie obniżamy kryteriów po to, żeby zamknąć sprint.
 
+Późniejsza dyspozycja „Pushnij” upoważniła do opublikowania sześciu gotowych
+commitów do `origin/main`, do `cb60bc8` włącznie (wykonano 2026-09-19).
+Nie oznacza stałej zgody na publikowanie kolejnych zmian bez dyspozycji.
+
 Niezależny przegląd przez agenta nazywamy przeglądem technicznym, nie audytem
 człowieka. Jeśli dalszy etap wymaga decyzji firmy, kończymy bezpieczny lokalny
 zakres i raportujemy konkretną brakującą decyzję, bez fikcyjnego PASS.

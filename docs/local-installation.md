@@ -1,9 +1,14 @@
-# Local Torii installation — 2026-09-19
+# Legacy workshop installation — 2026-09-19 snapshot
 
-Torii now runs the existing FrameML workshop data. The original
+This document describes the migrated **legacy Docker workshop**, not the new
+[Torii concept GUI](../apps/demo/README.md) at `http://127.0.0.1:18440`.
+The GUI uses separate local SQLite storage and does not use these volumes.
+Full enterprise integration remains under development. The service state and
+counts below are the recorded migration snapshot, not a live status check.
+
+At that snapshot, Torii ran the existing FrameML workshop data. The original
 `docker-images-ml` containers are stopped and retained. Other Docker projects
-were not changed. The application remains the workshop stack; the future Torii
-unified GUI has not been implemented yet.
+were not changed. These commands manage only the workshop stack.
 
 ## Daily commands
 
@@ -57,7 +62,7 @@ Physical volume names retain the old prefix to preserve data:
 | torii-datahub-opensearch | docker-images-ml_frameml-datahub-opensearch |
 
 MLflow retains `frameml-automl-demo`, `frameml-end-to-end-mvp`, 5 existing runs
-and versions 1–3 of `frameml-breast-cancer-classifier`. New Torii demo code uses
+and versions 1–3 of `frameml-breast-cancer-classifier`. The legacy Torii AutoML code uses
 these names via environment configuration. Data remains in `frameml-data` and
 model artifacts in `mlflow`. Original notebooks and all 57 original workspace
 files remain byte-for-byte unchanged; the Torii modules were added alongside.

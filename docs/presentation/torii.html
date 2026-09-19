@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Torii: działanie lokalnego demonstratora, model obiektów i zależności architektury.">
+  <title>Torii · działanie i architektura</title>
+  <style>
+    :root { color-scheme: dark; --bg:#141b25; --surface:#1d2734; --text:#f3f5f8; --muted:#b9c6d4; --line:#455568; --blue:#57c3f5; --coral:#ff7868; --green:#8bdbbd; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:"Segoe UI",Arial,sans-serif; font-size:18px; line-height:1.5; }
+    a { color:var(--blue); text-underline-offset:4px; }
+    a:hover { color:var(--text); }
+    button,select { font:inherit; color:var(--text); background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:9px 14px; min-height:44px; }
+    button { cursor:pointer; }
+    button:hover:not(:disabled) { border-color:var(--blue); }
+    button:disabled { opacity:.4; cursor:default; }
+    :focus-visible { outline:3px solid var(--blue); outline-offset:4px; }
+    .toolbar { max-width:1440px; margin:auto; padding:18px 32px; display:flex; align-items:center; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+    .wordmark { letter-spacing:.22em; font-weight:700; font-size:22px; }
+    .controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .controls label { color:var(--muted); font-size:14px; }
+    .controls select { max-width:330px; }
+    .js-controls { display:none; }
+    .enhanced .js-controls { display:flex; }
+    main { max-width:1440px; margin:auto; }
+    .slide { padding:42px 64px 32px; min-height:calc(100vh - 200px); border-bottom:1px solid var(--line); }
+    .slide[hidden] { display:none; }
+    .eyebrow { color:var(--blue); font-size:14px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; margin:0 0 14px; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { font-size:clamp(48px,6vw,78px); line-height:1.04; letter-spacing:-.045em; font-weight:650; margin-bottom:24px; }
+    h2 { font-size:clamp(34px,4vw,52px); line-height:1.15; letter-spacing:-.03em; font-weight:600; margin-bottom:24px; }
+    h3 { font-size:23px; line-height:1.25; font-weight:600; margin-bottom:12px; }
+    .lead { font-size:24px; max-width:880px; color:var(--muted); margin-bottom:32px; }
+    .muted,.note { color:var(--muted); }
+    .note { font-size:16px; margin-top:26px; }
+    .accent { color:var(--coral); }
+    .blue { color:var(--blue); }
+    .cover { display:grid; grid-template-columns:1.1fr 1fr; align-items:center; gap:44px; }
+    .cover img { display:block; width:100%; height:auto; }
+    .cover .note { margin-top:38px; }
+    .columns { display:grid; grid-template-columns:1fr 1fr; gap:48px; }
+    .columns > *, .cover > * { min-width:0; }
+    .list { list-style:none; padding:0; margin:0; }
+    .list li { padding:16px 0; border-bottom:1px solid var(--line); }
+    .list strong { display:block; font-size:22px; margin-bottom:4px; }
+    .steps { list-style:none; padding:0; margin:30px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:30px; counter-reset:step; }
+    .steps li { counter-increment:step; padding-top:18px; border-top:2px solid var(--line); }
+    .steps li::before { content:counter(step,decimal-leading-zero); color:var(--blue); font-size:30px; display:block; margin-bottom:12px; }
+    .steps p { color:var(--muted); margin-bottom:0; }
+    code { font-family:Consolas,monospace; font-size:.86em; overflow-wrap:anywhere; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:22px; background:#10161f; border-left:3px solid var(--blue); line-height:1.65; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; text-align:left; }
+    caption { text-align:left; color:var(--muted); margin-bottom:12px; }
+    th { color:var(--blue); font-size:16px; font-weight:600; }
+    td,th { padding:15px 16px 15px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+    td:last-child,th:last-child { padding-right:0; }
+    .metrics td:not(:first-child),.metrics th:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
+    .metrics td { font-size:26px; }
+    .metrics .best { color:var(--green); }
+    figure { margin:28px 0; }
+    figcaption { color:var(--muted); font-size:16px; margin-top:18px; }
+    .flow { display:grid; grid-template-columns:repeat(5,1fr); gap:22px; align-items:stretch; }
+    .node { border:1px solid var(--line); border-top:3px solid var(--blue); padding:18px; position:relative; background:var(--surface); }
+    .node strong { display:block; margin-bottom:8px; font-size:20px; }
+    .node small { display:block; font-size:16px; color:var(--muted); }
+    .flow .node:not(:last-child)::after { content:""; width:22px; height:1px; background:var(--blue); position:absolute; left:100%; top:50%; }
+    .node.result { border-top-color:var(--coral); }
+    .architecture { display:grid; grid-template-columns:1fr 1.15fr 1.1fr; gap:22px; align-items:start; }
+    .architecture .lane { display:grid; gap:20px; min-width:0; }
+    .lane-title { font-size:14px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); margin:0; }
+    .connector { color:var(--blue); font-size:16px; margin:0; }
+    .repo { color:var(--muted); }
+    .repo strong { color:var(--text); }
+    .numbers { display:flex; gap:50px; flex-wrap:wrap; margin:24px 0; }
+    .numbers strong { display:block; color:var(--blue); font-size:52px; line-height:1.2; font-weight:600; }
+    .numbers span { color:var(--muted); }
+    .foot { max-width:1440px; margin:auto; padding:20px 32px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; color:var(--muted); font-size:14px; }
+    .foot p { margin:0; }
+    .progress { height:3px; background:var(--line); }
+    .progress span { display:block; width:0; height:100%; background:var(--blue); }
+    .sources { font-size:15px; margin-top:30px; color:var(--muted); }
+    .sources a { margin-right:18px; }
+    @media(max-width:900px) {
+      .slide { padding:32px 28px; min-height:0; }
+      .cover { gap:20px; }
+      .columns { gap:28px; }
+      .architecture { grid-template-columns:1fr; }
+      .architecture .lane { grid-template-columns:1fr 1fr; }
+      .architecture .lane-title { grid-column:1/-1; }
+      .flow { grid-template-columns:1fr; gap:18px; }
+      .flow .node:not(:last-child)::after { width:1px; height:18px; left:50%; top:100%; }
+      .steps { grid-template-columns:repeat(2,1fr); }
+      .lead { font-size:21px; }
+    }
+    @media(max-width:600px) {
+      body { font-size:17px; }
+      .toolbar { padding:16px 20px; }
+      .slide { padding:30px 20px; }
+      .controls { width:100%; }
+      .controls select { width:100%; max-width:100%; }
+      .controls label { width:100%; }
+      .cover,.columns,.steps,.architecture .lane { grid-template-columns:1fr; }
+      .cover img { max-width:420px; }
+      .metrics td { font-size:19px; }
+      td,th { padding-right:12px; }
+      .numbers { gap:24px; }
+      .numbers strong { font-size:40px; }
+      .foot { padding:20px; }
+    }
+    @media print {
+      :root { color-scheme:light; --bg:white; --text:#162333; --muted:#384655; --blue:#005679; --coral:#9d3124; --line:#9ba7b2; --surface:#f3f5f7; --green:#116a4d; }
+      @page { size:A4 landscape; margin:12mm; }
+      body { font-size:13pt; }
+      .toolbar,.foot,.progress,.js-controls { display:none !important; }
+      .slide,.slide[hidden] { display:block !important; min-height:0; padding:8mm; border:0; break-after:page; }
+      .slide:last-child { break-after:auto; }
+      .cover { display:grid !important; }
+      h1 { font-size:44pt; } h2 { font-size:30pt; } h3 { font-size:17pt; }
+      .lead { font-size:16pt; } .note,figcaption,.sources { font-size:11pt; }
+      .steps { gap:18px; margin:18px 0; }
+      .node { padding:12px; } .node strong { font-size:14pt; } .node small { font-size:11pt; }
+      td,th { padding:10px 10px 10px 0; }
+      pre { background:var(--surface); }
+      a { color:inherit; }
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="wordmark" href="#slajd-1" aria-label="Torii, pierwszy slajd">TORII</a>
+    <div class="controls js-controls">
+      <label for="slide-picker">Temat</label>
+      <select id="slide-picker" aria-label="Wybierz slajd"></select>
+      <button id="overview" type="button" aria-pressed="false">Wszystkie slajdy</button>
+      <button id="print" type="button">Drukuj</button>
+    </div>
+    <a href="http://127.0.0.1:18440/" target="_blank" rel="noopener">Otwórz aplikację</a>
+  </header>
+  <main>
+    <section class="slide cover" id="slajd-1" data-title="Torii" aria-labelledby="title-1">
+      <div>
+        <p class="eyebrow">Demonstrator lokalny / wrzesień 2026</p>
+        <h1 id="title-1">Torii</h1>
+        <p class="lead">Dane, transformacje i eksperymenty w jednym interfejsie.</p>
+        <p>Jak działa aplikacja, co przechowuje i które moduły odpowiadają za wynik.</p>
+        <p class="note">Działający koncept do ręcznych testów.<br>Jedna osoba, dane niesensytywne, bez wdrożenia produkcyjnego.</p>
+      </div>
+      <img src="../brand/assets/torii-logo-reference.jpg" alt="Logo Torii: brama z koralowymi i błękitnymi połączeniami" width="2752" height="1536">
+    </section>
+
+    <section class="slide" id="slajd-2" data-title="Praca w aplikacji" aria-labelledby="title-2">
+      <p class="eyebrow">Przepływ użytkownika</p>
+      <h2 id="title-2">Praca w aplikacji</h2>
+      <ol class="steps">
+        <li><h3>Projekt</h3><p>Grupuje dane, definicje i wyniki jednego zadania.</p></li>
+        <li><h3>Dane</h3><p>Import CSV albo próbka syntetyczna. Podgląd, profil kolumn i wersja.</p></li>
+        <li><h3>Transformacja</h3><p>Zapis reguły i osobne wykonanie. Wynik otrzymuje własny obiekt danych.</p></li>
+        <li><h3>Model</h3><p>Wybór cech, celu i algorytmu: Ridge albo średnia jako baseline.</p></li>
+        <li><h3>Eksperyment</h3><p>Trening na konkretnej wersji danych i modelu. Rzeczywisty zapis MLflow.</p></li>
+        <li><h3>Analiza</h3><p>Porównanie metryk, predykcje i współczynniki. Pobranie modelu lub raportu.</p></li>
+      </ol>
+      <p class="note">Wyniki pozostają na dysku po odświeżeniu strony i restarcie aplikacji.</p>
+    </section>
+
+    <section class="slide" id="slajd-3" data-title="Obiekty, wersje i wykonania" aria-labelledby="title-3">
+      <p class="eyebrow">Model danych Torii</p>
+      <h2 id="title-3">Obiekty, wersje i wykonania</h2>
+      <p class="lead">Obiekt określa, czym coś jest. Wersja utrwala jego stan. Wykonanie zapisuje, co z tym stanem zrobiliśmy.</p>
+      <figure aria-label="Przepływ pochodzenia: dane źródłowe, transformacja, dane wynikowe, wykonanie modelu, analiza">
+        <div class="flow">
+          <div class="node"><strong>Dataset A / v1</strong><small>Snapshot CSV<br>Definicja + hash</small></div>
+          <div class="node"><strong>Transformacja / v1</strong><small>Reguła i referencja do konkretnego wejścia</small></div>
+          <div class="node"><strong>Dataset B / v1</strong><small>Nowy wynik<br>Referencje do źródła i transformacji</small></div>
+          <div class="node"><strong>Run</strong><small>Dataset B / v1<br>+ Model M / v1<br>Status i wynik</small></div>
+          <div class="node result"><strong>Analiza</strong><small>Referencja do runu, danych i modelu</small></div>
+        </div>
+        <figcaption>Lineage oznacza zapis pochodzenia. Zmiana danych nie podmienia wejścia zakończonego eksperymentu.</figcaption>
+      </figure>
+      <p class="note">Demo pozwala dopisać kolejną wersję datasetu. Nową konfigurację modelu lub transformacji zapisujemy jako nowy obiekt. Nie ma jeszcze ogólnego edytora wersji wszystkich typów.</p>
+    </section>
+
+    <section class="slide" id="slajd-4" data-title="Architektura działającego demo" aria-labelledby="title-4">
+      <p class="eyebrow">Runtime</p>
+      <h2 id="title-4">Architektura działającego demo</h2>
+      <figure>
+        <div class="architecture">
+          <div class="lane">
+            <p class="lane-title">Interfejs</p>
+            <div class="node"><strong>Przeglądarka</strong><small>React + TypeScript<br><code>apps/web/src/demo</code></small></div>
+            <p class="connector">HTTP na tym samym originie<br><code>127.0.0.1:18440</code><br><code>/demo-api/*</code></p>
+          </div>
+          <div class="lane">
+            <p class="lane-title">Koordynacja</p>
+            <div class="node"><strong>FastAPI + Uvicorn</strong><small><code>app.py</code><br>Walidacja, pliki UI, katalog i uruchamianie treningu</small></div>
+            <div class="node"><strong>Store + silnik danych</strong><small><code>store.py</code> i <code>data.py</code><br>Snapshoty, wersje, CSV i transformacje</small></div>
+          </div>
+          <div class="lane">
+            <p class="lane-title">Obliczenia i trwałość</p>
+            <div class="node result"><strong>Osobny worker Python</strong><small><code>worker.py</code><br>scikit-learn + klient MLflow</small></div>
+            <div class="node result"><strong>Lokalny dysk</strong><small><code>torii.sqlite</code> dla katalogu i danych<br><code>mlflow.sqlite</code> dla trackingu<br><code>runs/</code> dla artefaktów</small></div>
+          </div>
+        </div>
+        <figcaption>API zapisuje katalog przez Store i uruchamia worker jako subprocess. Worker zapisuje tracking oraz artefakty, a API udostępnia wynik w UI. Transformacje wykonuje proces API.</figcaption>
+      </figure>
+      <p class="note">Demo nie potrzebuje Dockera, PostgreSQL, MinIO ani osobnego serwera MLflow. Subprocess oddziela obliczenia, ale nie stanowi sandboxa bezpieczeństwa.</p>
+    </section>
+
+    <section class="slide" id="slajd-5" data-title="Przebieg treningu" aria-labelledby="title-5">
+      <p class="eyebrow">Od żądania do wyniku</p>
+      <h2 id="title-5">Przebieg treningu</h2>
+      <div class="columns">
+        <div>
+          <ol class="list">
+            <li><strong>1. Utrwalenie wejścia</strong>API wybiera wersję modelu i datasetu. Zapisuje run i wewnętrzny <code>job.json</code>.</li>
+            <li><strong>2. Obliczenia</strong>Worker dzieli dane na train/test. Dopasowuje preprocessing tylko na części treningowej.</li>
+            <li><strong>3. Tracking i artefakty</strong>MLflow zapisuje parametry, metryki i pliki. API tworzy referencję analizy i publikuje wynik.</li>
+          </ol>
+        </div>
+        <div>
+          <div class="numbers"><div><strong>75 / 25</strong><span>train / test</span></div><div><strong>42</strong><span>stały seed</span></div></div>
+          <p>Ridge: uzupełnienie braków medianą, standaryzacja i regresja liniowa z regularyzacją.</p>
+          <p>Baseline: stała predykcja równa średniej celu ze zbioru treningowego.</p>
+          <p class="note">Statusy: <code>queued</code>, <code>running</code>, <code>succeeded</code> lub <code>failed</code>. Jeden trening naraz, limit 120 s. Awaria trackingu oznacza brak sukcesu.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="slajd-6" data-title="Rola MLflow" aria-labelledby="title-6">
+      <p class="eyebrow">Podział odpowiedzialności</p>
+      <h2 id="title-6">Torii i MLflow</h2>
+      <div class="columns">
+        <div><h3 class="blue">Torii zarządza kontekstem</h3><ul class="list"><li>Projekty i katalog obiektów</li><li>Wersje danych i definicje transformacji</li><li>Powiązania wejść, modelu, wykonania i analizy</li><li>Formularze, podgląd i porównanie w jednym GUI</li></ul></div>
+        <div><h3 class="accent">MLflow zapisuje eksperyment</h3><ul class="list"><li>ID runu oraz parametry treningu</li><li>MAE, RMSE i R²</li><li>Model, raport i opis środowiska</li><li>Lokalny tracking SQLite i pliki artefaktów</li></ul></div>
+      </div>
+      <p class="note">Wszystkie runy demo trafiają do lokalnego eksperymentu „Torii local demo”. Torii zachowuje swój podział na projekty. Demo nie uruchamia osobnego MLflow UI ani procesu zatwierdzania modeli w Model Registry.</p>
+    </section>
+
+    <section class="slide" id="slajd-7" data-title="Zależności techniczne" aria-labelledby="title-7">
+      <p class="eyebrow">Budowanie a działanie</p>
+      <h2 id="title-7">Zależności techniczne</h2>
+      <div class="table-wrap"><table>
+        <caption>Zależności wynikają z manifestów i kodu demonstratora</caption>
+        <thead><tr><th>Warstwa</th><th>Narzędzia</th><th>Po co są potrzebne</th></tr></thead>
+        <tbody>
+          <tr><td>Start i pakiety</td><td>PowerShell, uv, Python 3.12</td><td>Launcher, izolowane środowisko <code>.venv</code>, zamrożony <code>uv.lock</code></td></tr>
+          <tr><td>Build interfejsu</td><td>Node ≥24.15 i &lt;25, npm 11, Vite, TypeScript</td><td>Kompilacja React do statycznych plików. Po buildzie UI serwuje FastAPI</td></tr>
+          <tr><td>API</td><td>FastAPI, Pydantic, Uvicorn</td><td>HTTP, walidacja kontraktów i lokalny serwer</td></tr>
+          <tr><td>Trening</td><td>scikit-learn, NumPy, joblib</td><td>Pipeline, podział danych, metryki i zapis dopasowanego modelu</td></tr>
+          <tr><td>Tracking</td><td>mlflow-skinny, SQLAlchemy, Alembic</td><td>Klient eksperymentów i obsługa lokalnej bazy trackingu</td></tr>
+          <tr><td>Magazyn Torii</td><td>SQLite z biblioteki standardowej Pythona</td><td>Metadane i snapshoty datasetów</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">Pełne wersje bibliotek: <code>apps/demo/uv.lock</code> i <code>apps/web/package-lock.json</code>. Pierwsza instalacja wymaga dostępu do rejestrów pakietów. Ta prezentacja nie pobiera niczego z sieci.</p>
+    </section>
+
+    <section class="slide" id="slajd-8" data-title="Repozytorium i dane" aria-labelledby="title-8">
+      <p class="eyebrow">Granice przechowywania</p>
+      <h2 id="title-8">Co trafia do Git, a co zostaje lokalnie</h2>
+      <div class="columns">
+        <div>
+          <h3 class="blue">Jedno repozytorium, osobne moduły</h3>
+          <ul class="list repo"><li><strong><code>apps/demo</code></strong>Python: API, Store, dane i worker</li><li><strong><code>apps/web/src/demo</code></strong>React: widoki i klient API demo</li><li><strong><code>scripts/demo.ps1</code></strong>Start, status i kontrolowane zatrzymanie</li><li><strong><code>specs</code>, <code>adr</code>, <code>docs</code></strong>Kontrakty, decyzje i instrukcje</li></ul>
+        </div>
+        <div>
+          <h3 class="accent">Osobny magazyn wyników</h3>
+          <pre><code>apps/demo/.local/data/
+  torii-demo-v1
+  torii.sqlite
+  mlflow.sqlite
+  runs/
+    &lt;run-id&gt;/
+    mlflow-artifacts/</code></pre>
+          <p><code>.local</code> i <code>.venv</code> są ignorowane przez Git. Push kodu nie wysyła projektów demo, wierszy danych ani wytrenowanych modeli.</p>
+        </div>
+      </div>
+      <p class="note">Eksport manifestu daje definicje, referencje, hashe i metryki. Nie jest pełną kopią zapasową ani automatycznym pakietem odtworzeniowym. Sprawdź manifest przed ręcznym dodaniem do Git.</p>
+    </section>
+
+    <section class="slide" id="slajd-9" data-title="Przykład wyniku" aria-labelledby="title-9">
+      <p class="eyebrow">Zapisany odbiór lokalny</p>
+      <h2 id="title-9">Porównanie na tych samych danych</h2>
+      <p class="lead">160 wierszy syntetycznych. Usunięcie braków daje 155 wierszy, z czego 116 służy do treningu i 39 do testu.</p>
+      <div class="table-wrap"><table class="metrics">
+        <caption>Metryki z rzeczywistych runów z 19.09.2026, nie dane pobierane na żywo</caption>
+        <thead><tr><th>Model</th><th>MAE</th><th>RMSE</th><th>R²</th></tr></thead>
+        <tbody><tr class="best"><td>Ridge, alpha 1</td><td>0,6498</td><td>0,7963</td><td>0,9986</td></tr><tr><td>Średnia train</td><td>17,5200</td><td>21,7702</td><td>−0,0718</td></tr></tbody>
+      </table></div>
+      <div class="columns" style="margin-top:32px"><p>Niższe MAE i RMSE oznaczają mniejszy błąd na tym samym zbiorze testowym.</p><p>Ridge pasuje do zadanej zależności liniowej. Ten wynik nie dowodzi jakości na rzeczywistych danych biznesowych.</p></div>
+      <p class="note">Współczynniki dotyczą cech po standaryzacji. Nie dowodzą przyczynowości i nie zastępują pełnego XAI.</p>
+      <p class="sources">Źródło: <a href="../../specs/0018-concept-demo/evidence.md">SPEC-0018, dowody odbioru</a></p>
+    </section>
+
+    <section class="slide" id="slajd-10" data-title="Pokaz w dziesięć minut" aria-labelledby="title-10">
+      <p class="eyebrow">Scenariusz demonstracji</p>
+      <h2 id="title-10">Pokaz w dziesięć minut</h2>
+      <div class="columns">
+        <div><h3>Uruchomienie z katalogu Torii</h3><pre><code>.\scripts\demo.ps1
+.\scripts\demo.ps1 -Action Status</code></pre><p><a href="http://127.0.0.1:18440/" target="_blank" rel="noopener">http://127.0.0.1:18440</a></p><p>Jeśli istnieje projekt „Torii — prezentacja”, można zacząć od jego wyników. Nowy klon repozytorium nie zawiera lokalnych projektów.</p><p class="note">CSV: UTF-8, separator przecinek, maks. 5 MiB w GUI, 5000 wierszy i 50 kolumn. Trening wymaga co najmniej 20 wierszy i liczbowego celu bez braków.</p></div>
+        <div><ol class="list"><li><strong>1. Dane i pochodzenie</strong>Nowy projekt, próbka syntetyczna, podgląd i profil.</li><li><strong>2. Przetwarzanie</strong>Transformacja „Usuń braki”. Osobny wynik, źródło bez zmian.</li><li><strong>3. Model i porównanie</strong>Cel <code>target</code>, cechy <code>x1/x2/x3</code>. Ridge i baseline na tej samej wersji.</li><li><strong>4. Wynik i trwałość</strong>Metryki, MLflow ID, model, eksport. Odświeżenie strony zachowuje wyniki.</li></ol></div>
+      </div>
+    </section>
+
+    <section class="slide" id="slajd-11" data-title="Trzy odrębne części projektu" aria-labelledby="title-11">
+      <p class="eyebrow">Zakres i ograniczenia</p>
+      <h2 id="title-11">Trzy odrębne części projektu</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Obszar</th><th>Stan</th><th>Rola i zależności</th></tr></thead>
+        <tbody>
+          <tr><td>Demo konceptu</td><td>Działa lokalnie</td><td>React, FastAPI, SQLite, scikit-learn, MLflow. Jedna osoba, bez SSO</td></tr>
+          <tr><td>Fundament enterprise</td><td>W realizacji</td><td>Osobne <code>apps/api</code>, główne UI, PostgreSQL, Keycloak i Caddy. Integracja OIDC i usług projektowych nie jest ukończona</td></tr>
+          <tr><td>Warsztat legacy</td><td>Osobna istniejąca ścieżka</td><td>Jupyter/code-server, AutoGluon, MLflow, PostgreSQL, MinIO, DataHub. Własne Compose i wolumeny</td></tr>
+        </tbody>
+      </table></div>
+      <p class="lead" style="margin-top:30px">Demo nie łączy tych magazynów i nie migruje starszej instalacji.</p>
+      <p class="note">Odłożone w nowym GUI: Parquet, konektory SQL, Jupyter, własny kod Python, modele regułowe, klasyfikacja, AutoML tuning, konta, pełne XAI i wdrożenia produkcyjne. Baseline średniej nie zastępuje obsługi dowolnych modeli nie-ML.</p>
+    </section>
+
+    <section class="slide" id="slajd-12" data-title="Dalszy rozwój i instrukcje" aria-labelledby="title-12">
+      <p class="eyebrow">Kolejne decyzje po testach</p>
+      <h2 id="title-12">Dalszy rozwój i instrukcje</h2>
+      <div class="columns">
+        <div><h3>Zależności przyszłych prac</h3><ul class="list"><li><strong>Współdzielenie</strong>Wymaga tożsamości, uprawnień do projektów, audytu i centralnego magazynu.</li><li><strong>Nowe źródła i modele</strong>Wymagają kontraktów adapterów, obsługi sekretów oraz kontrolowanego wykonywania kodu.</li><li><strong>Produkcja i odtwarzanie</strong>Wymagają kompletnych wejść, środowisk, wydań, zatwierdzeń i sprawdzonego odzyskiwania.</li></ul></div>
+        <div><h3>Materiały do pracy</h3><ul class="list"><li><a href="../../apps/demo/README.md">Pierwsze uruchomienie i ręczny test</a></li><li><a href="../demo-operations.md">Eksploatacja, diagnostyka i poprawki</a></li><li><a href="../demo-architecture.md">Moduły i zależności w kodzie</a></li><li><a href="../platform/sprint-plan.md">Docelowy plan platformy</a></li><li><a href="../../README.md">README repozytorium</a></li></ul><p class="note">Najbliższy krok: ocena przepływu pracy przez użytkownika i lista konkretnych poprawek. Plan enterprise pozostaje otwarty.</p></div>
+      </div>
+    </section>
+  </main>
+  <div class="progress js-controls" aria-hidden="true"><span id="progress-fill"></span></div>
+  <footer class="foot">
+    <p id="position" aria-live="polite" aria-atomic="true">12 slajdów / demonstrator SPEC-0018</p>
+    <div class="controls js-controls"><button id="previous" type="button">Poprzedni</button><button id="next" type="button">Następny</button></div>
+    <p>Stan kodu: e44d6d5 · Dokumentacja: 19.09.2026</p>
+  </footer>
+  <script>
+    (() => {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const picker = document.getElementById('slide-picker');
+      const previous = document.getElementById('previous');
+      const next = document.getElementById('next');
+      const overview = document.getElementById('overview');
+      let current = 0;
+      let all = false;
+      slides.forEach((slide, index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = `${index + 1}. ${slide.dataset.title}`;
+        picker.append(option);
+      });
+      function readHash() {
+        const index = slides.findIndex(slide => `#${slide.id}` === location.hash);
+        return index < 0 ? 0 : index;
+      }
+      function render() {
+        slides.forEach((slide, index) => { slide.hidden = !all && index !== current; });
+        picker.value = String(current);
+        previous.disabled = all || current === 0;
+        next.disabled = all || current === slides.length - 1;
+        overview.setAttribute('aria-pressed', String(all));
+        overview.textContent = all ? 'Tryb prezentacji' : 'Wszystkie slajdy';
+        document.getElementById('position').textContent = all ? `Wszystkie slajdy (${slides.length})` : `${current + 1} / ${slides.length} · ${slides[current].dataset.title}`;
+        document.getElementById('progress-fill').style.width = `${100 * (current + 1) / slides.length}%`;
+      }
+      function show(index) {
+        current = Math.max(0, Math.min(slides.length - 1, index));
+        all = false;
+        try {
+          history.replaceState(null, '', `#${slides[current].id}`);
+        } catch (error) {
+          // Some local-file hosts disallow URL rewriting. Keep navigation in memory.
+          if (error.name !== 'SecurityError') throw error;
+        }
+        render();
+        window.scrollTo(0, 0);
+      }
+      previous.addEventListener('click', () => show(current - 1));
+      next.addEventListener('click', () => show(current + 1));
+      picker.addEventListener('change', () => show(Number(picker.value)));
+      overview.addEventListener('click', () => { all = !all; render(); window.scrollTo(0, 0); });
+      document.getElementById('print').addEventListener('click', () => window.print());
+      window.addEventListener('hashchange', () => { current = readHash(); all = false; render(); });
+      document.addEventListener('keydown', event => {
+        if (all || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.target.closest('input,select,textarea,button,a,[contenteditable]')) return;
+        const keys = { ArrowRight:current + 1, ArrowLeft:current - 1, Home:0, End:slides.length - 1 };
+        if (Object.hasOwn(keys, event.key)) { event.preventDefault(); show(keys[event.key]); }
+      });
+      current = readHash();
+      render();
+      document.documentElement.classList.add('enhanced');
+    })();
+  </script>
+</body>
+</html>

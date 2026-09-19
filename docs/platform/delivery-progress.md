@@ -23,6 +23,39 @@ Nie uznawać enterprise sprintów za ukończone na podstawie demonstratora.
 Automatyzacja `torii-realizacja-sprint-w`: PAUSED po osiągnięciu lokalnego celu;
 nie wznawiać dalszej rozbudowy bez nowej dyspozycji użytkownika.
 
+## 2026-09-19 — porządki dokumentacji i prezentacja konceptu
+
+Po osobnym poleceniu użytkownika opublikowano sześć commitów do `origin/main`,
+do `cb60bc8` włącznie. Następna dyspozycja dotyczyła README, instrukcji
+i prezentacji HTML. Zakres dokumentacyjny SPEC-0018 D07, bez zmiany aplikacji.
+
+- README prowadzi najpierw do działającego demo. Szczegóły starszych obrazów
+  i warsztatu zachowano w `docs/legacy-workspaces.md`; rozdzielono trzy profile.
+- `apps/demo/README.md`, `docs/demo-operations.md` i `docs/demo-architecture.md`
+  opisują test ręczny, restart po poprawce, diagnostykę, magazyny i zależności.
+  Kopia danych po zatrzymaniu jest instrukcją, nie dowodem zwalidowanego restore.
+- `docs/presentation/torii.html`: 12 slajdów, oryginalne logo, obiekty i wersje,
+  przepływ treningu, MLflow, Git/dane, zależności oraz granice demo/enterprise.
+  Brak zasobów sieciowych, CDN i telemetrii. Wymaga lokalnego logo z repozytorium.
+- `node scripts/check-demo-docs.mjs`: PASS, 11 dokumentów, 120 lokalnych
+  odnośników, 12 slajdów, nawigacja, fallback bez JS oraz wywołanie druku/CSS.
+  Kontrola druku nie oznacza obejrzenia wydruku ani eksportu PDF.
+- Przegląd w prawdziwej przeglądarce przez tymczasowy serwer loopback obejmował
+  slajdy, przełączanie tematów i tryb całości. Brak błędów konsoli. Na szerokości
+  390 px wszystkie slajdy mieszczą się w szerokości strony (375 px obszaru treści);
+  diagramy układają się pionowo. Domyślny viewport przywrócono.
+  Bezpośredni test `file://` zablokowała polityka przeglądarki narzędziowej;
+  nie obchodzono ograniczenia. Weryfikacja browser dotyczy HTTP na localhost.
+  Osobny test jednostkowy jsdom wykazał odmowę `history.replaceState` dla file URL.
+  RED→GREEN: prezentacja zachowuje nawigację w pamięci przy SecurityError,
+  bez obchodzenia odmowy zapisu URL. To test jednostkowy, nie browser file PASS.
+- Zweryfikowano źródła, składnię 11 bloków PowerShell i `git diff --check`.
+  Niezależny przegląd dokumentacji i ograniczonego fallbacku nawigacji: GREEN.
+  Po kontroli zatrzymano własny tymczasowy serwer dokumentacji na 18441.
+  Nie powtarzano pełnych testów backendu/GUI: ich kod i zależności nie uległy zmianie.
+  Nie zmieniano `.env`, danych, wolumenów ani usług demo/enterprise/legacy.
+  Automatyzacja rozbudowy pozostaje PAUSED, nowe zmiany dokumentacji bez push.
+
 ## 2026-09-19 — start mandatu autonomicznego
 
 Baseline planu: `a7b19a5`. SP-00: kontrakty OpenAPI/JSON Schema i specyfikacje
