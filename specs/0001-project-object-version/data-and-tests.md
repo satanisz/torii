@@ -1,6 +1,6 @@
 # SPEC-0001 — zapis, inwarianty i plan dowodów
 
-Rewizja 0.3, Accepted (delegated). Schemat logiczny; wykonanie migracji wymaga dowodu.
+Rewizja 0.4, Accepted (delegated). Schemat logiczny; wykonanie migracji wymaga dowodu.
 
 ## Relacje i ograniczenia
 

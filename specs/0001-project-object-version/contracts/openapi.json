@@ -3,7 +3,7 @@
   "info": {
     "title": "Torii Project/Object/Version API",
     "version": "0.2.0",
-    "description": "SPEC-0001 accepted under delegated delivery mandate; wire format 0.2.0, semantics revision 0.3. Not all routes are implemented. See ../access-and-api.md for normative semantics, error ordering and conditional CSRF. Authentication alternatives are exclusive. Common error response vocabulary includes infrastructure-level errors; applicability is defined in the prose contract."
+    "description": "SPEC-0001 accepted under delegated delivery mandate; wire format 0.2.0, semantics revision 0.4. Not all routes are implemented. See ../access-and-api.md for normative semantics, error ordering and conditional CSRF. Authentication alternatives are exclusive. Common error response vocabulary includes infrastructure-level errors; applicability is defined in the prose contract."
   },
   "servers": [
     {

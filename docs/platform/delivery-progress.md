@@ -75,3 +75,47 @@ Kontynuacja w tym zadaniu: heartbeat `torii-realizacja-sprint-w`, co 30 minut.
 Wymaga działającej aplikacji i komputera. Po ukończeniu możliwego lokalnie zakresu
 lub rzeczywistej blokadzie wymagającej użytkownika wstrzymać automatyzację i
 raportować stan; nie deklarować fikcyjnego odbioru enterprise.
+
+## 2026-09-19 — B1: transakcje projektów (heartbeat)
+
+Commit **`27df731`**: trwały ProjectService, polityka dostępu, membership/audit,
+idempotency receipts, blokady i bezpieczna granica transakcji. Spec B1 została
+przyjęta po niezależnym review przed kodem; semantics SPEC-0001 rev0.4, wire0.2.0.
+Brak nowego HTTP/auth bypass, migracji i wdrożenia na uruchomionym stosie.
+
+Końcowa bramka `./scripts/check-platform-foundation.ps1 -IncludePostgres` PASS:
+**273 backend bez DB + 23 real PostgreSQL + 50 frontend**. Kontrakty, Ruff,
+format, strict mypy, lint/types/build, audyty zależności i 35 kontroli PowerShell
+PASS. Wszystkie testy PostgreSQL wykonane na nowych efemerycznych zasobach,
+osobna migrowana baza na test, biznesowe operacje kontem runtime. Nie jest to
+mock ani test na danych firmy. Zdalny workflow pozostaje niewykonany.
+
+Dowody obejmują równoległy create/retry, rollback audit/receipt i błąd commit,
+brak wycieku projektów, odmowę po revoke w trakcie czekania na lock, last-owner
+race, snapshot policy/ETag, timeout503 i stronicowanie z powtarzającym się czasem.
+Przeglądy agentów domknięte; wykryte PG*/remote-Docker ryzyka harnessu naprawiono
+i sprawdzono testami negatywnymi. To review techniczne, nie audyt człowieka.
+
+Szczegóły: [raport B1](sp-01-b1-evidence.md) oraz
+`deploy/platform/evidence-harness-b1.md`. Dane jednorazowych testów tmpfs
+odrzucono po kontrolowanym cleanup; legacy, root `.env` i trwała nowa baza
+`test-abcdef012345` pozostały nienaruszone. Nie wykonano push ani PR.
+
+### Następny krok — nie powtarzać B1
+
+SP-01 nadal **w realizacji**, cały SPEC-0001/0002/0017 bez statusu Verified.
+
+1. B2: doprecyzować i przejrzeć spec adaptera OIDC/JWT/sesji, potem implementacja
+   i testy. Użyć istniejących tabel sessions/oidc_flows i rzeczywistego
+   lokalnego Keycloak, bez hardcoded identity ani nadawania create na login.
+   [Propozycja B2](../../specs/0001-project-object-version/increment-b2.md)
+   jest już zapisana i przeczytana przez integratora, lecz pozostaje **Proposed**:
+   B2-D01–06 wymagają rozstrzygnięcia/review przed odpowiednim kodem. Rozdziela
+   B2a adapters/storage od B2b HTTP/E2E; nie jest akceptacją własną autora.
+2. Następnie połączyć ProjectService z FastAPI i istniejącym React UI;
+   przetestować realne logowanie wielu użytkowników oraz surowe API/CSRF/revoke.
+3. Wciąż brak restart/restore, rate limiting/metrics/retention, zasobów/NFR,
+   pełnych skanów secrets/images/licenses/SBOM oraz ręcznego UX/a11y.
+4. Nie przechodzić do SP-02 przed obowiązkowymi bramkami SP-01. Firma nie jest
+   potrzebna do następnego lokalnego przyrostu, lecz pozostaje warunkiem
+   odbioru enterprise. Automatyzacja kontynuacji pozostaje aktywna.

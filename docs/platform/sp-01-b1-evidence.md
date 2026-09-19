@@ -1,7 +1,8 @@
 # SP-01 B1 — trwała usługa projektów
 
 2026-09-19. Zakres: [SPEC B1](../../specs/0001-project-object-version/increment-b1.md).
-Baseline `b442d18`. B1 zweryfikowany w opisanej granicy usługi aplikacyjnej;
+Baseline `b442d18`; kod i dowody przyrostu: **`27df731`**.
+B1 zweryfikowany w opisanej granicy usługi aplikacyjnej;
 nie jest to ukończony SP-01 ani status Verified całego SPEC-0001.
 
 ## Co zaimplementowano
