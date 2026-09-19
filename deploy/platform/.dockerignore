@@ -1,0 +1,5 @@
+# Allowlist: neither .local secrets nor root legacy configuration is sent to builds.
+*
+!Caddyfile
+!gateway.Dockerfile
+!web.Caddyfile

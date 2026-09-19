@@ -1,6 +1,6 @@
 # SPEC-0001: projekty, uprawnienia i wersje definicji
 
-Status: **Accepted (delegated)**. Rewizja: 0.2.
+Status: **Accepted (delegated)**. Rewizja: 0.3 (semantyka; format OpenAPI 0.2.0).
 Data: 2026-09-19. Podstawa: [mandat użytkownika](../../docs/platform/delivery-mandate.md).
 Implementacja/testy runtime: do wykonania; brak statusu Verified.
 Kontrola schematów i przykładów jest osobnym dowodem specyfikacji, nie funkcji.
@@ -34,7 +34,7 @@ UI wyraźnie komunikuje „definicja — niewykonana”; nie oferuje fikcyjnego 
 Udostępnianie między projektami to osobny przyrost; w tym zakresie odrzucamy
 referencje między projektami. Nie wprowadzamy hasła współdzielonego przez zespół.
 
-## Kontrakty rewizji 0.2
+## Kontrakty rewizji 0.3
 
 | Artefakt | Co określa |
 |---|---|
@@ -135,21 +135,28 @@ Przyłączenie obecnej demonstracji jest późniejszą SPEC migracji/importu.
 Nie przeklasyfikowujemy historycznych rekordów DataHub `PROD` na rzeczywiście
 zatwierdzone wydania produkcyjne.
 
-## Decyzje do akceptacji — nadal blokują Ready
+## Przyjęty baseline i granice akceptacji
 
 Przygotowano rekomendacje D-04/D-05: testowy Keycloak/OIDC, role reader/editor/owner,
 pełna polityka do 100 członków na projekt w S1, JCS/SHA-256, ETag i transakcje
 serializowane per projekt. Limity i dokładny format podano w kontraktach.
-Do akceptacji jest ich zakres oraz powiązane SPEC-0002/0017; niezależny reviewer
-i pojemność SP-01 wymagają wskazania. Nie domyślamy się polityki firmy.
+Zakres oraz SPEC-0002/0017 objęto mandatem delegowanej realizacji.
+Przegląd techniczny kontraktów prowadzi oddzielny agent; nie zastępuje audytu
+firmowego i nie ustanawia polityki firmy.
 
-Definition of Ready obecnie **niespełniona** do czasu zapisu akceptacji rewizji.
-Żadne AC runtime nie ma dowodu PASS. Pakiet jest gotowy do przeglądu technicznego,
-nie stanowi polecenia uruchomienia generatora backendu.
+Zakres SP-01 dopuszczony do implementacji po przeglądzie technicznym.
+Żadne AC runtime nie otrzymuje PASS przez samą akceptację kontraktów.
 
 ## Historia
+
+- 0.3: przegląd niezależnego agenta wykrył potrzebę powiązania OIDC z inicjującą
+  przeglądarką oraz kontroli bieżącej widoczności przy createProject replay.
+  Doprecyzowano również binding pełnej kolekcji w cursor. Integrator przyjął
+  zmiany przed kodem odpowiednich ścieżek, w granicach mandatu. Bez zmiany
+  pól request/response kontraktu maszynowego 0.2.0.
 
 - 0.1: szkic domeny, 15 AC i otwarte pytania.
 - 0.2: konkretne kontrakty API/schema, role/sesja, transakcje, limity i walidacja
   offline. Archiwizacja owner-only, no-op dla identycznego digestu, osobna
-  polityka ACL i pełna rewizja reprezentacji obiektu. Akceptacja: brak.
+  polityka ACL i pełna rewizja reprezentacji obiektu. Accepted (delegated)
+  na podstawie mandatu z 2026-09-19.

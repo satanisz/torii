@@ -65,6 +65,11 @@ przetwarzania rzeczywistych danych produkcyjnych.
 
 ## Stan tego dostarczenia
 
+Aktualizacja realizacyjna: [dziennik](delivery-progress.md) jest źródłem bieżącego
+stanu; opis poniżej zachowuje punkt odniesienia końca planowania SP-00.
+Pierwsze fundamenty FastAPI, UI i odizolowanej infrastruktury są w realizacji,
+nie oznacza to ukończenia SP-01 ani gotowości produkcyjnej.
+
 Powstał pakiet planistyczny i zasady pracy w `AGENTS.md`. W SP-00 przygotowano
 OpenAPI/JSON Schema, przykłady i ich walidator offline, SPEC-0001 0.2 oraz
 SPEC-0002/0017 0.1 do review. Nie powstały backend, frontend, migracje ani

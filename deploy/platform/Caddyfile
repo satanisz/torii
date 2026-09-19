@@ -1,0 +1,98 @@
+{
+	admin off
+	auto_https disable_redirects
+	skip_install_trust
+	persist_config off
+	log default {
+		format filter {
+			wrap json
+			fields {
+				request delete
+			}
+		}
+	}
+	servers {
+		timeouts {
+			read_header 5s
+			read_body 15s
+			write 30s
+			idle 2m
+		}
+	}
+}
+https://localhost:9443 {
+	tls internal
+	route {
+		@invalid_host not header Host localhost:{$TORII_HTTPS_PORT}
+		error @invalid_host "Invalid host" 400
+		request_body {
+			max_size 262144
+		}
+		header {
+			?X-Request-ID {http.request.uuid}
+			X-Content-Type-Options nosniff
+			Referrer-Policy no-referrer
+			X-Frame-Options DENY
+			Permissions-Policy "camera=(), microphone=(), geolocation=()"
+			-Server
+		}
+		# Never expose IdP admin or master realm via the application gateway.
+		@identity path /identity/realms/torii-dev/* /identity/resources/*
+		handle @identity {
+			reverse_proxy identity:8080 {
+				header_up Host localhost:{$TORII_HTTPS_PORT}
+				header_up X-Forwarded-Host localhost:{$TORII_HTTPS_PORT}
+				header_up X-Forwarded-Proto https
+				header_up X-Forwarded-Port {$TORII_HTTPS_PORT}
+				header_up -Forwarded
+				header_up -X-Real-IP
+			}
+		}
+		handle /identity/* {
+			respond "Not found" 404
+		}
+		@backend path /api/* /auth/* /health/*
+		handle @backend {
+			reverse_proxy api:8000 {
+				header_up Host localhost:{$TORII_HTTPS_PORT}
+				header_up -Forwarded
+				header_up -X-Forwarded-For
+				header_up -X-Forwarded-Host
+				header_up -X-Forwarded-Proto
+				header_up -X-Real-IP
+			}
+		}
+		handle {
+			reverse_proxy web:8080
+		}
+	}
+	handle_errors 400 {
+		header Content-Type application/problem+json
+		header Cache-Control no-store
+		header X-Request-ID {http.request.uuid}
+		respond `{"type":"urn:torii:problem:invalid_host","title":"Invalid host","status":400,"code":"invalid_host","request_id":"{http.request.uuid}","errors":[]}` 400
+	}
+	handle_errors 413 {
+		header Content-Type application/problem+json
+		header Cache-Control no-store
+		header X-Request-ID {http.request.uuid}
+		respond `{"type":"urn:torii:problem:payload_too_large","title":"Payload too large","status":413,"code":"payload_too_large","request_id":"{http.request.uuid}","errors":[]}` 413
+	}
+	handle_errors 5xx {
+		header Content-Type application/problem+json
+		header Cache-Control no-store
+		header X-Request-ID {http.request.uuid}
+		header Retry-After 3
+		respond `{"type":"urn:torii:problem:service_unavailable","title":"Service unavailable","status":503,"code":"service_unavailable","request_id":"{http.request.uuid}","errors":[]}` 503
+	}
+}
+
+# Match an untrusted Host after the specific localhost route, while reusing the
+# localhost certificate selected by SNI. Never issue certificates on demand.
+https://:9443 {
+	tls internal
+	header Content-Type application/problem+json
+	header Cache-Control no-store
+	header X-Request-ID {http.request.uuid}
+	respond `{"type":"urn:torii:problem:invalid_host","title":"Invalid host","status":400,"code":"invalid_host","request_id":"{http.request.uuid}","errors":[]}` 400
+}

@@ -1,0 +1,76 @@
+# SPEC-0002 AC-04: first gates only; not proof of OIDC/E2E/enterprise qualification.
+name: Platform foundation
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: platform-foundation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: '0.11.19'
+          python-version: '3.12.12'
+          enable-cache: false
+      - name: Frozen installation
+        run: uv sync --frozen
+      - name: Canonical contract
+        run: uv run --python 3.12 --no-project ../../specs/0001-project-object-version/validate_contracts.py
+      - name: Lint and format
+        run: |
+          uv run --frozen ruff check src tests migrations
+          uv run --frozen ruff format --check src tests migrations
+      - name: Strict types and tests
+        run: |
+          uv run --frozen mypy
+          uv run --frozen pytest -q --cov
+      - name: Known Python dependency vulnerabilities
+        run: |
+          uv export --frozen --no-dev --no-editable --no-emit-project --output-file .venv/runtime-requirements.txt --quiet
+          uvx --from pip-audit==2.10.1 pip-audit --disable-pip --no-deps -r .venv/runtime-requirements.txt
+
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.15.0'
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=low
+
+  infrastructure-tools:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Bounded lifecycle guards
+        shell: pwsh
+        run: ./deploy/platform/test-tools.ps1

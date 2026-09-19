@@ -1,7 +1,9 @@
 # SP-00 — kontrakty i przygotowanie do implementacji
 
-Status: In progress — kontrakty przygotowane do review. Nie jest jeszcze odebrany.
-Powiązania: S0, SPEC-0001/0002/0017 w review, ADR-0001/0002/0003.
+Status: baseline kontraktów przyjęty do realizacji na podstawie
+[mandatu](../delivery-mandate.md). Opcjonalne warianty logo i późniejsze próby
+techniczne pozostają otwarte przed zależnymi sprintami, nie blokują SP-01.
+Powiązania: S0, SPEC-0001/0002/0017, ADR-0001/0002/0003.
 Cel: zamknąć niepewności blokujące pierwszy pionowy przyrost, nie projektować
 szczegółowo wszystkich szesnastu celów roadmapy.
 

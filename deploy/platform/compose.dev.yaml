@@ -1,0 +1,207 @@
+# SPEC-0002 / SP01-02. Use platform.ps1; never combine with the legacy root env.
+name: ${TORII_COMPOSE_PROJECT:?Provision an isolated instance first}
+
+x-labels: &labels
+  io.torii.scope: platform
+  io.torii.instance: ${TORII_INSTANCE:?Missing instance}
+
+x-logging: &logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-api: &api
+  image: ${TORII_COMPOSE_PROJECT}-api:local
+  build:
+    context: ../../apps/api
+    dockerfile: ../../deploy/platform/api.Dockerfile
+  labels: *labels
+  networks: [app, data]
+  read_only: true
+  tmpfs: ["/tmp:size=64m,mode=1777"]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  init: true
+  pids_limit: 128
+  cpus: 1
+  mem_limit: 768m
+  logging: *logging
+
+services:
+  database:
+    image: postgres:17@sha256:67f41722b7a8cbdb868a44a4995c846eddfdc2973bccb291ce937dce88ad5675
+    labels: *labels
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_admin
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=peer
+    secrets: [postgres_admin, postgres_migrator, postgres_runtime, postgres_identity]
+    volumes:
+      - database:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/10-torii.sh:ro
+    networks: [data]
+    healthcheck:
+      test: [CMD, gosu, postgres, pg_isready, -U, postgres, -d, postgres]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    pids_limit: 128
+    cpus: 1
+    mem_limit: 1536m
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+
+  identity:
+    image: quay.io/keycloak/keycloak:26.7.4@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c
+    labels: *labels
+    entrypoint: [/bin/bash, /opt/torii/identity-entrypoint.sh]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://database:5432/torii_identity
+      KC_DB_USERNAME: torii_identity
+      KC_HOSTNAME: https://localhost:${TORII_HTTPS_PORT:?Missing port}/identity
+      KC_HOSTNAME_STRICT: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /identity
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: torii-admin
+      JAVA_OPTS_KC_HEAP: -Xms256m -Xmx1024m
+    secrets: [postgres_identity, identity_admin]
+    volumes:
+      - ./identity-entrypoint.sh:/opt/torii/identity-entrypoint.sh:ro
+      - ${TORII_LOCAL_DIR:?Missing local directory}/realm.json:/opt/keycloak/data/import/torii-dev.json:ro
+    networks: [app, data]
+    depends_on:
+      database: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9000; printf \"GET /identity/health/ready HTTP/1.0\r\n\r\n\" >&3; grep -q \"200 OK\" <&3'"]
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 30
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 256
+    cpus: 1.5
+    mem_limit: 2g
+    logging: *logging
+
+  migrate:
+    <<: *api
+    command: [uv, run, --frozen, --no-sync, --no-dev, alembic, upgrade, head]
+    environment:
+      TORII_DATABASE_URL_FILE: /run/secrets/database_migrator_url
+    secrets: [database_migrator_url]
+    depends_on:
+      database: {condition: service_healthy}
+    restart: "no"
+
+  api:
+    <<: *api
+    environment:
+      TORII_DATABASE_URL_FILE: /run/secrets/database_runtime_url
+      TORII_SESSION_KEY_FILE: /run/secrets/session_key
+      TORII_CURSOR_KEY_FILE: /run/secrets/cursor_key
+      TORII_OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc_client_secret
+      TORII_PUBLIC_URL: https://localhost:${TORII_HTTPS_PORT}
+      TORII_OIDC_ISSUER: https://localhost:${TORII_HTTPS_PORT}/identity/realms/torii-dev
+      TORII_OIDC_BACKCHANNEL_URL: http://identity:8080/identity/realms/torii-dev
+      TORII_OIDC_CLIENT_ID: torii-web
+      TORII_OIDC_AUDIENCE: torii-api
+    secrets: [database_runtime_url, session_key, cursor_key, oidc_client_secret]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      identity: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import os, urllib.request, urllib.parse; r=urllib.request.Request('http://127.0.0.1:8000/health/ready', headers={'Host':urllib.parse.urlsplit(os.environ['TORII_PUBLIC_URL']).netloc}); urllib.request.urlopen(r, timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+
+  web:
+    image: ${TORII_COMPOSE_PROJECT}-web:local
+    build:
+      context: ../../apps/web
+      dockerfile: ../../deploy/platform/web.Dockerfile
+      additional_contexts:
+        platform: .
+        contracts: ../../specs/0001-project-object-version/contracts
+    labels: *labels
+    networks: [app]
+    read_only: true
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    cpus: 0.25
+    mem_limit: 128m
+    logging: *logging
+
+  gateway:
+    image: ${TORII_COMPOSE_PROJECT}-gateway:local
+    build:
+      context: .
+      dockerfile: gateway.Dockerfile
+    labels: *labels
+    environment:
+      TORII_HTTPS_PORT: ${TORII_HTTPS_PORT}
+    ports: ["127.0.0.1:${TORII_HTTPS_PORT}:9443"]
+    networks: [ingress, app]
+    volumes:
+      - gateway_data:/data
+      - gateway_config:/config
+    read_only: true
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    cpus: 0.25
+    mem_limit: 128m
+    depends_on:
+      api: {condition: service_healthy}
+      web: {condition: service_started}
+    logging: *logging
+
+networks:
+  ingress:
+    labels: *labels
+  app:
+    internal: true
+    labels: *labels
+  data:
+    internal: true
+    labels: *labels
+
+volumes:
+  database:
+    labels: *labels
+  gateway_data:
+    labels: *labels
+  gateway_config:
+    labels: *labels
+
+secrets:
+  postgres_admin:
+    file: ${TORII_LOCAL_DIR}/secrets/postgres_admin
+  postgres_migrator:
+    file: ${TORII_LOCAL_DIR}/secrets/postgres_migrator
+  postgres_runtime:
+    file: ${TORII_LOCAL_DIR}/secrets/postgres_runtime
+  postgres_identity:
+    file: ${TORII_LOCAL_DIR}/secrets/postgres_identity
+  identity_admin:
+    file: ${TORII_LOCAL_DIR}/secrets/identity_admin
+  database_migrator_url:
+    file: ${TORII_LOCAL_DIR}/secrets/database_migrator_url
+  database_runtime_url:
+    file: ${TORII_LOCAL_DIR}/secrets/database_runtime_url
+  session_key:
+    file: ${TORII_LOCAL_DIR}/secrets/session_key
+  cursor_key:
+    file: ${TORII_LOCAL_DIR}/secrets/cursor_key
+  oidc_client_secret:
+    file: ${TORII_LOCAL_DIR}/secrets/oidc_client_secret

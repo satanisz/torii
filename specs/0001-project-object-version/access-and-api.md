@@ -1,6 +1,6 @@
 # SPEC-0001 — tożsamość, prawa i semantyka API
 
-Rewizja 0.2, In review; brak akceptacji. Normatywna propozycja dla SP-01/02.
+Rewizja 0.3, Accepted (delegated); podstawa w README. Kontrakt SP-01/02.
 Kontrakt maszynowy: [OpenAPI](contracts/openapi.json).
 Schemat treści definicji: [JSON Schema](contracts/definitions.schema.json).
 
@@ -32,6 +32,11 @@ Tokeny odświeżania, jeżeli użyte, pozostają szyfrowane po stronie serwera.
 - Login: `GET /auth/login` (303 do IdP), callback: `GET /auth/callback`
   (303 na `/projects` albo stały ekran błędu). State/nonce/PKCE są jednorazowe,
   z TTL 5 min. Brak dowolnego parametru redirect URL, brak open redirect.
+- Flow jest powiązany z inicjującą przeglądarką: cookie `__Host-torii-login`
+  (losowe, Secure, HttpOnly, SameSite=Lax, Path=/, bez Domain, 5 min) wiąże się
+  hashem z rekordem flow. Callback wymaga state oraz tego cookie, sprawdza TTL
+  i zużywa je atomowo przed wymianą code; usuwa cookie również po błędzie.
+  Samo state przesłane linkiem w innej przeglądarce nie wystarcza do logowania.
 - Brak dostępu do IdP/JWKS bez ważnego klucza z cache zamyka nowe logowania
   i walidację nieznanego klucza. Nie wyłączamy weryfikacji na czas awarii.
   Cache znanych kluczy maks. 5 min; klucz o nieznanym `kid` wymusza ograniczony
@@ -78,6 +83,11 @@ Nazwy projektów/obiektów 1–120 znaków bez skrajnych białych znaków, opis 
 Endpoint bez requestBody odrzuca niepusty body jako 400 zamiast go ignorować.
 Nieznane pola odrzucamy, duplicate keys i niepoprawny JSON: 400. Nie wykonujemy
 deklaracji Python/SQL. Głębokie/duże dane: 413; zły Content-Type: 415.
+W S1 wszystkie liczby wejściowe muszą być dokładnymi bezpiecznymi integerami:
+1.0/1e3 są dopuszczalne jako 1/1000, lecz 1.0000000000000001 nie jest zaokrąglane.
+Wartość ułamkowa lub poza ±(2^53−1) daje 422; NaN/Infinity/przepełnienie IEEE-754
+400. U+0000 w stringu lub kluczu daje 422, ponieważ PostgreSQL nie zapisze go
+w text/JSONB. Walidacja następuje przed fingerprintem i próbą persystencji.
 Serwer generuje UUIDv4 i czas UTC, nie przyjmuje actor, project, digest, status
 ani version number z pól wejściowych. `kind` jest niezmienne po utworzeniu obiektu.
 
@@ -88,6 +98,9 @@ Lista członkostw używa `(created_at,principal_id)` rosnąco. Brak total count.
 Filtr nazw `q` to literalny case-insensitive substring, 1–100 znaków, nie regex.
 Przy paginacji stale sprawdzamy bieżące ACL; nie gwarantujemy snapshotu listy
 między stronami. Dodane później rekordy mogą trafić na kolejną stronę.
+
+Cursor ma maks. 2048 znaków; wiązanie obejmuje pełną kanoniczną ścieżkę
+kolekcji (w tym object_id dla list wersji), nie sam typ listy/projekt.
 
 Cursor obcego aktora, uszkodzony lub wygasły: 400 `invalid_cursor` bez rozróżnienia.
 Filtry i limity nie mogą wpływać na zakres praw. Brak nagłówka autoryzacji: 401.
@@ -129,6 +142,9 @@ dostarczonego przez klienta nagłówka jako zaufanego ID.
   sprawdzenie idempotencji, sprawdzenie If-Match, reguły domeny, zapis.
   Retry zatwierdzonej operacji zwraca jej status/body i ETag/Location, nawet jeśli
   ETag jest już historyczny; świeży X-Request-ID identyfikuje retry. Nie omija ACL.
+- Retry createProject sprawdza także aktualną widoczność projektu zapisanego
+  w receipt. Samo globalne `project.create` nie wystarcza po odebraniu członkostwa;
+  taki retry daje 404. Odpowiedź nie ujawnia dawnego projektu ani jego roli.
 - Każda mutacja projektu bierze row lock projektu, autoryzuje ponownie i zapisuje
   stan + audyt + receipt idempotencji w jednej transakcji. W S1 serializujemy
   mutacje per projekt dla prostoty poprawności; koszt mierzymy przed zmianą modelu.

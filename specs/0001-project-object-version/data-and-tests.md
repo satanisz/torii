@@ -1,6 +1,6 @@
 # SPEC-0001 — zapis, inwarianty i plan dowodów
 
-Rewizja 0.2, In review. Schemat logiczny, nie wykonana migracja SQL.
+Rewizja 0.3, Accepted (delegated). Schemat logiczny; wykonanie migracji wymaga dowodu.
 
 ## Relacje i ograniczenia
 
@@ -18,6 +18,10 @@ Rewizja 0.2, In review. Schemat logiczny, nie wykonana migracja SQL.
 | audit_events | UUID PK, org/project, actor, action, target/version, outcome, UTC, request ID, minimalny delta; append-only dla roli aplikacji |
 | idempotency_receipts | UNIQUE(actor,scope,operation,key), fingerprint, status/body/headers, expires_at; commit wspólny z mutacją |
 | sessions / oidc_flows | Hash opaque ID, principal, TTL, CSRF/state/nonce/PKCE state, szyfrowane tokeny; brak sekretów w danych projektu |
+
+Audyt mutacji w SP-01 zapisuje `outcome=allowed` zgodnie z enum OpenAPI;
+`denied` jest zarezerwowane w kontrakcie, lecz odmowy dostępu są na tym etapie
+osobną telemetrią, nie fikcyjnymi zatwierdzonymi zmianami domeny.
 
 UUID nie jest mechanizmem autoryzacji. Referencje projektu są częścią zapytań
 i kluczy obcych, nie filtrem dopisywanym dopiero w UI. Oddzielna rola migracji,
@@ -70,6 +74,11 @@ inne ID i ACL. Brak mechanizmu „pobierz dowolną wersję tylko po hashu”.
 | AC-13 | Klawiatura, draft/versions/conflict, no-store, sesja i ta sama polityka w surowym API | E2E/UX |
 | AC-14 | Exp/issuer/audience/alg/kid, CSRF/Origin, login replay, XSS tekstu/SQL/Python, błędy bez sekretów | Security |
 | AC-15 | Upgrade z fixture SP-01, restore do nowej bazy, porównanie ID/ACL/canonical bytes/audit | Migracja/DR |
+
+Regresje review 0.3: callback OIDC z poprawnym state lecz innym/brakującym
+cookie przeglądarki nie tworzy sesji; równoczesne callback nie mogą zużyć flow
+dwa razy. Retry createProject po odebraniu członkostwa daje 404 mimo globalnego
+grantu create; cursor wersji nie przechodzi między dwoma obiektami projektu.
 
 Fixtures: P1 z A-owner/B-editor/C-reader; P2 z E-owner; A i B mogą zmieniać
 draft dla testu konkurencji. C nie zapisuje; B nie zmienia grants; E nie widzi

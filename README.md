@@ -2,9 +2,12 @@
 
 ![Torii — modular data, analytics and model platform](docs/brand/assets/torii-logo-reference.jpg)
 
-Torii is the product name for the planned modular data, analytics and model
-platform. This repository currently contains its working AutoML workshop
-foundation; the unified UI and object-management API are not implemented yet.
+Torii is the product name for the modular data, analytics and model platform.
+This repository contains the existing AutoML workshop and the first platform
+foundation under development: [FastAPI backend](apps/api/README.md),
+React/TypeScript UI in `apps/web`, and [isolated infrastructure](deploy/platform/README.md).
+OIDC/project services and the object-management API are not integrated yet;
+this is not a production-ready enterprise platform.
 The repository is https://github.com/satanisz/torii.
 
 ## Enterprise platform planning — spec first
@@ -12,7 +15,8 @@ The repository is https://github.com/satanisz/torii.
 The target is a multi-user corporate platform, not a single-user application.
 The [platform planning package](docs/platform/README.md) describes requirements,
 the object/version/run model, architecture, security, Git integration and phased
-acceptance criteria. It is a draft for review, not implemented functionality.
+acceptance criteria. The [delivery log](docs/platform/delivery-progress.md)
+distinguishes implemented and verified increments from future functionality.
 The [sprint plan](docs/platform/sprint-plan.md) combines infrastructure, backend
 and frontend work, with detailed cards for the first three iterations. The
 [brand reference](docs/brand/README.md) preserves the user-provided Torii logo.

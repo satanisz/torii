@@ -1,0 +1,15 @@
+# Overlay only: lifecycle script requires instance test-<12 lowercase hex chars>.
+# Base project and all resource names remain unique to the run.
+services:
+  database:
+    labels:
+      io.torii.lifecycle: ephemeral-test
+  api:
+    labels:
+      io.torii.lifecycle: ephemeral-test
+  identity:
+    labels:
+      io.torii.lifecycle: ephemeral-test
+  gateway:
+    labels:
+      io.torii.lifecycle: ephemeral-test

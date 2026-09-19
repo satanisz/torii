@@ -1,6 +1,6 @@
 # SPEC-0002 — fundament infrastruktury i dostarczania
 
-Rewizja 0.1, 2026-09-19. Status: **Accepted (delegated)**.
+Rewizja 0.2, 2026-09-19. Status: **Accepted (delegated)**.
 Podstawa: [mandat użytkownika](../../docs/platform/delivery-mandate.md).
 Wymagania: NFR-01/04/05/06/07/08/09. Przyrosty: SP-01/02.
 
@@ -9,7 +9,8 @@ Wymagania: NFR-01/04/05/06/07/08/09. Przyrosty: SP-01/02.
 Powtarzalne środowisko API/UI/tożsamości/bazy, bez uzależniania rdzenia od
 obrazu AutoML i bez naruszania działającej demonstracji. Nie obejmuje runnera
 kodu użytkownika, MLflow proxy, pełnego deploymentu firmy ani konfiguracji
-zdalnego GitHub bez osobnego zlecenia. Nie powstają teraz usługi ani workflow.
+zdalnego GitHub bez osobnego zlecenia. Stan implementacji usług/workflow
+i dowody są w [dzienniku realizacji](../../docs/platform/delivery-progress.md).
 
 ## Wybór bazowy do akceptacji
 
@@ -34,7 +35,7 @@ Proponowane pliki nowego stosu: `deploy/platform/compose.dev.yaml`,
 `deploy/platform/compose.test.yaml` oraz lokalny ignorowany
 `deploy/platform/.env`. Nie zmieniamy aktualnego `.env` w root ani jego mapowań.
 Nowy projekt Compose `torii-platform-dev`; testy mają unikatowy identyfikator runu.
-To nazwy planowane — tych plików jeszcze nie ma.
+Implementacja tych plików jest przyrostem SP-01; samo ich istnienie nie zalicza AC.
 
 | Usługa | Dostęp / dane | Ograniczenia |
 |---|---|---|
@@ -92,6 +93,24 @@ AC. Kontrole required checks/branch protection mają osobny udokumentowany stan;
 sam zielony workflow nie dowodzi, że nie można go ominąć.
 
 ## Eksploatacja lokalna
+
+Doprecyzowanie 0.2 przed kodem (przegląd bounded planu przez oddzielnego agenta):
+`GET /health/live` zwraca 200 `{"status":"live"}` bez bazy;
+`GET /health/ready` zwraca 200 `{"status":"ready"}` tylko przy bazie z dokładnie
+wymaganą migracją, inaczej 503 Problem Details, Retry-After 3. Oba publiczne
+wyłącznie przez jawnie skonfigurowany origin; bez echo DSN lub numeru schematu.
+Nie przyjmują body. Wszystkie odpowiedzi, także błędy, mają no-store i nowe UUID
+request ID. Obcy Host daje 400; nagłówki proxy klienta nie zmieniają origin.
+Timeout 15 s obejmuje odczyt body oraz dispatch, 503 `request_timeout`.
+Limit bajtów egzekwujemy przed parsowaniem; walidację treści wykonujemy dopiero
+po autoryzacji właściwego zasobu. Log dostępu zawiera metodę/status/czas/request ID,
+bez surowej ścieżki, query string, nagłówków, body i wyjątków zawierających wejścia.
+
+Sekrety przez `TORII_*_FILE`; bezpośrednie `TORII_*` dozwolone wyłącznie przy
+jawnym `TORII_PROFILE=test`. Dwie obecne formy (również jedna pusta) są błędem.
+Brak automatycznego czytania root `.env`. Profile w tym przyroście: dev/test;
+`prod` odrzucany do kwalifikacji infrastruktury. Dokładny kontrakt konfiguracji
+i mapowanie AC: [plan API](../../apps/api/IMPLEMENTATION.md).
 
 - Health liveness nie pyta bazy; readiness sprawdza bazę i zgodność schema,
   bez fałszywego green przy brakującej migracji. Endpointy nie ujawniają DSN.
