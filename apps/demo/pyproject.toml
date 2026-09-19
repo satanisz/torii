@@ -1,0 +1,30 @@
+[project]
+name = "torii-demo"
+version = "0.1.0"
+description = "SPEC-0018 local-only Torii concept demonstrator"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.141.1", "uvicorn==0.53.0", "pydantic==2.13.5",
+  "scikit-learn>=1.7,<2", "pandas>=2.3,<3", "mlflow-skinny==3.14.0",
+  "sqlalchemy==2.0.54", "alembic==1.20.0",
+]
+
+[dependency-groups]
+dev = ["pytest==9.1.1", "httpx==0.28.1", "ruff==0.16.8"]
+
+[build-system]
+requires = ["hatchling==1.29.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/torii_demo"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

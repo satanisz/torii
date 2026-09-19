@@ -33,6 +33,14 @@ zakres i raportujemy konkretną brakującą decyzję, bez fikcyjnego PASS.
 
 ## Kontynuacja i odbiór
 
+Aktualizacja2026-09-19: użytkownik priorytetyzuje ręcznie testowalny demonstrator
+konceptu i jawnie dopuszcza mniejszy zakres zamiast100%enterprise. SPEC-0018/ADR-0004
+wydzielają lokalny, jednoosobowy profil bez SSO i oddzielnych firmowych danych.
+To nowy cel najbliższego odbioru; nie zalicza niespełnionych AC enterprise sprintów.
+SDD/review, rzeczywiste funkcje, testy i izolacja legacy nadal obowiązują.
+Najpierw spójny flow CSV→transformacja→regresja→MLflow→porównanie wReact,
+potem rozbudowa. Parquet/SQL/Jupyter/multiuser/rozbudowaneXAI odłożone.
+
 Źródłem bieżącego stanu jest [dziennik realizacji](delivery-progress.md).
 Każdy wpis rozróżnia implementację, wykonane kontrole i brakujące AC.
 Pełen sprint jest ukończony dopiero po spełnieniu jego obowiązkowych AC.
