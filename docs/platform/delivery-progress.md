@@ -226,3 +226,58 @@ pełnym skanem historii. API nadal działa na starszym obrazie fundamentu.
 5. SP-01 w realizacji, cały SPEC-0001/0002/0017 nie Verified, SP-02 jeszcze
    nie rozpoczynać. Lokalny następny przyrost nie wymaga decyzji firmy;
    automatyzacja kontynuacji pozostaje aktywna, bez udawania odbioru enterprise.
+
+## 2026-09-19 — B2a3: ograniczony transport metadanych i cache OIDC
+
+Commit **`21bc4f0`**: GET discovery/JWKS do ustalonych endpointów, publiczne
+klucze z B2a2, cache per issuer/loop, TTL300s, single-flight i cooldown30s także
+po awarii/anulowaniu. Brak redirect/proxy env/provider cookies, bounded raw
+stream bez dekompresji, fail-closed i atomowa wymiana snapshotu. Bez nowych
+routes, DB writes, konfiguracji, zależności, migracji lub wdrożenia.
+
+Spec przyjęto po niezależnym review przed implementacją. Testy rozpoczęły RED.
+Review zamknął InvalidURL poza safe boundary, nieograniczony cleanup oraz
+pomylenie obsłużonego cancellation callera z anulowaniem nowej operacji.
+Zapisano granicę runtime CPython dla inherited caller context; provider chain
+nadal odrzucany, brak markera w formatted traceback i brak pozornego sukcesu.
+Cleanup ma osobny cooperative limit1s, który przyszły callback MUSI zarezerwować
+w końcowym budżecie; nie ma detached tasks ani obietnicy hard realtime.
+
+Finalna walidacja root `./scripts/check-platform-foundation.ps1 -IncludePostgres`:
+**1086 backend +53 real PostgreSQL +50 frontend PASS**, exit0. Nowe testy201;
+PG to regresja istniejącego B1/B2a1, nie integracja OIDC z persistence.
+Run `594c5b19a12743cf999f1e241d85382e`:53 PASS,88.35s; zasoby usunięte po guardach,
+tmpfs odrzucony, brak pozostawionych kontenerów/sieci b1-integration.
+Ruff/format52, mypy28, kontrakty/JCS, FE lint/types/build/drift, audyty zależności
+i35 kontroli PowerShell PASS. Dwa znane dependency deprecation warnings oraz
+rekomendacja pip-audit dot. hashy pozostają jawne; zdalnego CI nie uruchamiano.
+
+Finalny niezależny review GREEN,201 testów ponownie PASS/6.94s. Testy łączą
+symulowane raw HTTP z rzeczywistą kryptografią RSA; nie dowodzą TLS/DNS/socket
+timeouts ani Keycloak loginu. [Pełny raport i ograniczenia](sp-01-b2a3-evidence.md).
+Scoped staged check13 lokalnych sekretów PASS, nie pełny skan historii.
+Root `.env`, legacy/trwałe zasoby, firma i remote bez zmian; brak push/PR.
+Trwały API nadal na starszym obrazie fundamentu, bez deploy nowego komponentu.
+
+Przerwę w realizacji spowodował limit usługi agentów; automatyczne heartbeat
+w tym okresie nie oznaczają dodatkowo wykonanej pracy. Wznowiono istniejący WIP,
+nie przepisywano ukończonych B1/B2a1/B2a2. Nie jest to blokada decyzją firmy.
+
+### Następny krok — B2a4, bez powtarzania B2a3
+
+1. Spec i review code exchange/revocation przed kodem. Użyć B2a3 metadata/cache
+   oraz B2a2 TokenVerifier zamiast duplikowania podpisów. Token response bounded,
+   token_type Bearer, oba podpisy/nonce/at_hash i zgodny issuer/sub; brak POST retry.
+2. Bezpieczne DTO i profil logowania PRZED przekazywaniem credentials: HTTPX INFO
+   loguje URL/reason, httpcore DEBUG może logować headers/exception. Obecne moduły
+   nie dodają logów, ale to nie jest dowód pełnej ochrony logowania.
+3. Zdefiniować orchestration i wspólny deadline z1s rezerwą cleanup. B2a1
+   consume_flow commit PRZED siecią, brak DB locks podczas HTTP, sesja dopiero
+   po pełnej walidacji, refresh szyfrowany dla best-effort revoke, bez auto refresh.
+   B2b HTTP/cookie/CSRF/projekty oraz bootstrap/E2E wymagają osobnego kontraktu.
+4. B2-AC01/02/03/04 nadal częściowe; B2-AC05/06/07, real Keycloak/UI/raw API,
+   DR/restore, rate limits, retencja, metryki, NFR, pełne skany/SBOM i UX/a11y
+   nie są zaliczone. SP-01 In progress; SPEC-0001/0002/0017 nie Verified.
+   Nie rozpoczynać SP-02, nie ogłaszać enterprise ani pełnego loginu.
+5. Kolejny lokalny przyrost nie wymaga decyzji użytkownika. Kontynuacja pozostaje
+   aktywna; nie wstrzymywać automatyzacji z powodu samego podziału prac na przyrosty.
