@@ -1,5 +1,7 @@
 # Torii
 
+![Torii — modular data, analytics and model platform](docs/brand/assets/torii-logo-reference.jpg)
+
 Torii is the product name for the planned modular data, analytics and model
 platform. This repository currently contains its working AutoML workshop
 foundation; the unified UI and object-management API are not implemented yet.
@@ -17,7 +19,9 @@ and frontend work, with detailed cards for the first three iterations. The
 All behavior changes follow [Spec Driven Development](docs/platform/spec-driven-development.md)
 and the repository's [contributor/agent rules](AGENTS.md). The first
 [project and object-version specification](specs/0001-project-object-version/README.md)
-is not yet approved for implementation.
+is authorized for implementation under the
+[recorded delivery mandate](docs/platform/delivery-mandate.md). The backend uses
+**FastAPI**, with a separate React/TypeScript frontend and isolated infrastructure.
 
 **Upgrading an existing installation?** Read
 [the Torii rename and Docker migration guide](docs/torii-migration.md) before

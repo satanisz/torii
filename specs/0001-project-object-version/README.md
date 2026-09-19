@@ -1,8 +1,9 @@
 # SPEC-0001: projekty, uprawnienia i wersje definicji
 
-Status: **Draft — niegotowa do implementacji**. Rewizja: 0.1.
-Data: 2026-09-19. Właściciel akceptacji: właściciel produktu, potwierdzenie roli
-wymagane. Akceptacja rewizji: brak. Implementacja/testy: nie rozpoczęto.
+Status: **Accepted (delegated)**. Rewizja: 0.2.
+Data: 2026-09-19. Podstawa: [mandat użytkownika](../../docs/platform/delivery-mandate.md).
+Implementacja/testy runtime: do wykonania; brak statusu Verified.
+Kontrola schematów i przykładów jest osobnym dowodem specyfikacji, nie funkcji.
 
 Wymagania: FR-01, FR-02, część FR-11/FR-12, NFR-01/04/07/08/09/10.
 ADR: [0001](../../adr/0001-platform-boundaries.md),
@@ -33,29 +34,21 @@ UI wyraźnie komunikuje „definicja — niewykonana”; nie oferuje fikcyjnego 
 Udostępnianie między projektami to osobny przyrost; w tym zakresie odrzucamy
 referencje między projektami. Nie wprowadzamy hasła współdzielonego przez zespół.
 
-## Kontrakt do doprecyzowania w rewizji 0.2
+## Kontrakty rewizji 0.2
 
-Minimalne pola: project ID, object ID, kind, nazwa, właściciel, revision draftu,
-schema version, canonical definition, digest, version ID, author i timestamp UTC.
-ID to identyfikatory niezmienne, nie nazwy ani ścieżki. Typ obiektu po utworzeniu
-nie jest zmieniany. Dla każdej wersji zapisujemy dokładny payload podlegający
-hashowaniu; algorytm kanonizacji wymaga przykładów zgodnych dla Python i JS.
+| Artefakt | Co określa |
+|---|---|
+| [OpenAPI 3.1](contracts/openapi.json) | 21 operacji, request/response, security, parametry i błędy |
+| [Schema definicji](contracts/definitions.schema.json) | Typowane Dataset/Transformation, Python/SQL i źródła logiczne |
+| [Przykłady](contracts/examples.json) | Pozytywne/negatywne payloady oraz oczekiwane bajty JCS |
+| [Uprawnienia i API](access-and-api.md) | OIDC/sesja, role, błędy, ETag, idempotencja, limity i reguły domeny |
+| [Dane i testy](data-and-tests.md) | Model relacyjny, ograniczenia, transakcje, digest i macierz AC |
+| [Walidator specyfikacji](validate_contracts.py) | Powtarzalna kontrola schematów/przykładów bez uruchamiania platformy |
 
-Proponowany kształt API, **jeszcze nie zamrożony kontrakt**:
-
-- `/api/v1/projects` — lista i utworzenie projektu;
-- `/api/v1/projects/{project_id}/memberships` — uprawniona zmiana członkostwa;
-- `/api/v1/projects/{project_id}/objects` — lista i utworzenie obiektu;
-- `/api/v1/projects/{project_id}/objects/{object_id}` — szczegóły;
-- `.../draft` — odczyt i edycja z revision/ETag;
-- `.../versions` — lista i finalizacja wersji definicji;
-- `.../versions/{version_id}` — odczyt niezmiennego payloadu;
-- `.../archive` — audytowana archiwizacja, nie fizyczne usunięcie historii.
-
-Metody, request/response, kody błędów, paginacja, limity, schema obu typów,
-macierz ról i zasady idempotency zostaną zapisane w OpenAPI/JSON Schema
-z poprawnymi i błędnymi przykładami przed Accepted. Nie generujemy jeszcze
-API z tego szkicu ani nie pozwalamy implementującemu zgadywać kontraktu.
+Pliki JSON są kanonicznym źródłem formatu; dokumenty określają semantykę,
+której schema nie egzekwuje (ACL, referencje, transakcje, CSRF i unikatowość portów).
+Sprzeczność blokuje akceptację; nie wybieramy wygodniejszej interpretacji w kodzie.
+Żaden z tych artefaktów nie jest zatwierdzony samym faktem jego zapisania.
 
 ## Inwarianty i proponowane zachowanie
 
@@ -70,7 +63,7 @@ API z tego szkicu ani nie pozwalamy implementującemu zgadywać kontraktu.
 6. Tożsamy retry z tym samym idempotency key w ustalonym okresie zwraca ten sam
    rezultat bez nowej wersji ani nowego zdarzenia audytu zmiany. Żądania i odmowy
    mogą mieć osobne zdarzenia dostępowe. Ten sam klucz z innym payloadem to konflikt.
-   Zakres klucza obejmuje aktora, projekt i operację; czas retencji do ustalenia.
+   Zakres klucza obejmuje aktora, projekt i operację; retencja wynosi 24 h.
 7. Archiwizacja blokuje edycję/publikację, ale zachowuje historię dla uprawnionych.
    Wyścig archiwizacji z finalizacją ma serializowany, testowany wynik.
 8. Uprawnienia sprawdzamy dla każdej operacji, również starej wersji.
@@ -119,7 +112,7 @@ kontraktowe przykłady OpenAPI, integracja z prawdziwym PostgreSQL i testowym
 IdP, konkurencyjne transakcje, E2E UI plus klient API, migracja/restore.
 Docelowe lokalizacje (do utworzenia w implementacji):
 `tests/acceptance/test_spec_0001.py`, `tests/integration/`, `apps/web/tests/`.
-Macierz testów i typy danych zostaną rozwinięte przed akceptacją rewizji 0.2.
+Macierz rozszerza dokument danych i testów; kontrole schematów nie zaliczają AC runtime.
 
 ## Plan implementacji po akceptacji
 
@@ -142,16 +135,21 @@ Przyłączenie obecnej demonstracji jest późniejszą SPEC migracji/importu.
 Nie przeklasyfikowujemy historycznych rekordów DataHub `PROD` na rzeczywiście
 zatwierdzone wydania produkcyjne.
 
-## Otwarte decyzje — blokują Ready
+## Decyzje do akceptacji — nadal blokują Ready
 
-- D-04/D-05 z [planu](../../docs/platform/roadmap.md): konkretny testowy IdP,
-  model uprawnień i tożsamości, finalizacja/kanonizacja definicji.
-- Kontrakt obu typów, granice pola code/source reference oraz zakaz wykonania.
-- OpenAPI/JSON Schema, constraints i indeksy bazy, limity/paginacja,
-  kody błędów, czas retencji idempotency oraz zasady konfliktów.
-- Polityka logów/audytu, prosty threat model tego przyrostu, CI i review owner.
-- Uzgodnienie kryteriów i zapis akceptacji konkretnej rewizji.
+Przygotowano rekomendacje D-04/D-05: testowy Keycloak/OIDC, role reader/editor/owner,
+pełna polityka do 100 członków na projekt w S1, JCS/SHA-256, ETag i transakcje
+serializowane per projekt. Limity i dokładny format podano w kontraktach.
+Do akceptacji jest ich zakres oraz powiązane SPEC-0002/0017; niezależny reviewer
+i pojemność SP-01 wymagają wskazania. Nie domyślamy się polityki firmy.
 
-Definition of Ready obecnie **niespełniona**. Żadne AC nie ma dowodu PASS.
-Ten szkic jest następnym przedmiotem prac specyfikacyjnych, nie poleceniem
-uruchomienia generatora backendu.
+Definition of Ready obecnie **niespełniona** do czasu zapisu akceptacji rewizji.
+Żadne AC runtime nie ma dowodu PASS. Pakiet jest gotowy do przeglądu technicznego,
+nie stanowi polecenia uruchomienia generatora backendu.
+
+## Historia
+
+- 0.1: szkic domeny, 15 AC i otwarte pytania.
+- 0.2: konkretne kontrakty API/schema, role/sesja, transakcje, limity i walidacja
+  offline. Archiwizacja owner-only, no-op dla identycznego digestu, osobna
+  polityka ACL i pełna rewizja reprezentacji obiektu. Akceptacja: brak.

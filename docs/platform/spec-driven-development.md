@@ -10,7 +10,9 @@ proponowany baseline do przeglądu. Nie jest to deklaracja certyfikacji.
    scenariuszami negatywnymi, wpływem na dane i bezpieczeństwo.
 3. Zaprojektuj kontrakty, model stanów, migrację i plan testów. Dla istotnych
    decyzji zapisz ADR z alternatywami i konsekwencjami.
-4. Przeprowadź przegląd i zapisz akceptację uprawnionego człowieka.
+4. Przeprowadź przegląd i zapisz akceptację uprawnionego człowieka albo
+   zastosowanie jawnego [mandatu delegowanej realizacji](delivery-mandate.md).
+   Delegowana akceptacja techniczna nie zastępuje ludzkiego odbioru enterprise.
 5. Rozbij zaakceptowany zakres na małe zadania; najpierw przygotuj testy
    kontraktów/inwariantów, następnie kod. Nie dopisuj wymagań po fakcie,
    aby zalegalizować nieplanowane zachowanie.

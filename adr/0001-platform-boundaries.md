@@ -1,11 +1,12 @@
 # ADR-0001: granice platformy i rozwój obecnego repozytorium
 
-Status: Proposed. Data: 2026-09-19. Akceptujący: nie wskazano.
+Status: Accepted (delegated). Data: 2026-09-19.
+Podstawa: [mandat realizacji](../docs/platform/delivery-mandate.md).
 
 Aktualizacja kontekstu 2026-09-19: użytkownik potwierdził preferencję podejścia
 modułowego i zlecił plan sprintów obejmujący infrastrukturę, backend i frontend.
-Jest to potwierdzenie kierunku, nie formalna akceptacja wszystkich szczegółów
-tego ADR ani kontraktów implementacyjnych. Status pozostaje Proposed.
+Późniejsze zlecenie autonomicznej realizacji przyjęło baseline techniczny;
+nie jest ono odbiorem produkcyjnym ani audytem każdej decyzji przez użytkownika.
 
 ## Kontekst
 

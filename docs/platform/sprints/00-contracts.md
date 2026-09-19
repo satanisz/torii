@@ -1,7 +1,7 @@
 # SP-00 — kontrakty i przygotowanie do implementacji
 
-Status: Planned / projekt zakresu. Nie jest jeszcze odebrany.
-Powiązania: S0, SPEC-0001, planowane SPEC-0002/0017, ADR-0001/0002/0003.
+Status: In progress — kontrakty przygotowane do review. Nie jest jeszcze odebrany.
+Powiązania: S0, SPEC-0001/0002/0017 w review, ADR-0001/0002/0003.
 Cel: zamknąć niepewności blokujące pierwszy pionowy przyrost, nie projektować
 szczegółowo wszystkich szesnastu celów roadmapy.
 
@@ -15,7 +15,8 @@ dostępu do firmy, zakupu chmury ani zmiany bieżącego Dockera.
 
 M = obowiązkowe dla celu; O = opcjonalne. Właściciele oznaczają role potrzebne
 do odbioru, nie automatycznie utworzone zespoły. Estymata każdej pozycji przed
-wyborem do iteracji; obecnie nieustalona. Wszystkie pozycje mają status Planned.
+wyborem implementacji; obecnie nieustalona. Tabela opisuje zakres planu.
+Aktualny stan i dowody opisuje [podsumowanie SP-00](../sp-00-review.md).
 
 | ID | Tor / priorytet | Zadanie i artefakt | Zależność | Kryterium odbioru |
 |---|---|---|---|---|

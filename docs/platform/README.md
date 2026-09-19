@@ -1,6 +1,7 @@
 # Torii — plan platformy korporacyjnej
 
-Data: 2026-09-19. Status: **Draft — do przeglądu, bez zgody na implementację**.
+Data: 2026-09-19. Status: **baseline dopuszczony do lokalnej realizacji**.
+Zakres zgody: [mandat użytkownika](delivery-mandate.md), stan: [dziennik](delivery-progress.md).
 Punkt odniesienia kodu: `fbd4b1f` / `2f94f77` na `main`.
 
 ## Cel produktu
@@ -28,9 +29,9 @@ Potwierdzone w rozmowie:
 - Spec Driven Development przed każdą implementacją.
 - preferencja modułowej budowy, przekazane logo jako kierunek identyfikacji.
 
-Propozycje wymagające przeglądu: dokładne kontrakty, role, technologie,
-kolejność realizacji i parametry eksploatacyjne. Żaden ADR w tym pakiecie nie
-jest jeszcze Accepted. Nie wybrano dostawcy tożsamości ani infrastruktury firmy.
+Baseline kontraktów, ról i technologii objęto mandatem autonomicznej realizacji.
+Parametry firmowe pozostają propozycjami: nie wybrano dostawcy tożsamości ani
+infrastruktury firmy. Keycloak jest lokalnym IdP developerskim.
 
 ## Jak czytać pakiet
 
@@ -43,6 +44,7 @@ jest jeszcze Accepted. Nie wybrano dostawcy tożsamości ani infrastruktury firm
 | [Bezpieczeństwo i jakość](security-and-quality.md) | Zagrożenia, kontrole i dowody wymagane przed pilotażem |
 | [Plan realizacji](roadmap.md) | Etapy, zależności, scenariusz odbiorowy, decyzje i ryzyka |
 | [Plan sprintów](sprint-plan.md) | Zintegrowane przyrosty infrastruktury, backendu i frontendu; szczegółowo SP-00–02 |
+| [SP-00: pakiet do review](sp-00-review.md) | Konkretne kontrakty, rekomendacje i dowody kontroli specyfikacji |
 | [Rejestr specyfikacji](../../specs/README.md) | Istniejąca SPEC-0001 i jawne rezerwacje kolejnych numerów |
 | [Logo i identyfikacja](../brand/README.md) | Oryginał od użytkownika i zakres przygotowania do UI |
 | [SPEC-0001](../../specs/0001-project-object-version/README.md) | Pierwsza konkretna specyfikacja: projekty, katalog obiektów i wersje |
@@ -63,14 +65,16 @@ przetwarzania rzeczywistych danych produkcyjnych.
 
 ## Stan tego dostarczenia
 
-Powstał pakiet planistyczny i zasady pracy w `AGENTS.md`. Nie powstały backend,
-frontend, kontrakty wykonywalne, migracje ani nowe mechanizmy ochronne.
+Powstał pakiet planistyczny i zasady pracy w `AGENTS.md`. W SP-00 przygotowano
+OpenAPI/JSON Schema, przykłady i ich walidator offline, SPEC-0001 0.2 oraz
+SPEC-0002/0017 0.1 do review. Nie powstały backend, frontend, migracje ani
+nowe mechanizmy ochronne runtime.
 Pakiet rozszerzono o prognozowany plan sprintów, karty SP-00–02, rejestr SPEC
 i niezmienioną kopię przekazanego logo. Preferencja modularności nie oznacza
 akceptacji wszystkich szczegółów ADR ani Definition of Ready dla implementacji.
 Nie zmieniono działającej instalacji Docker, danych ani `.env`.
 Testy odbiorowe wymienione w planie są **planowane, nie wykonane**.
 
-Przed pierwszym kodem produktu: przegląd założeń, zamknięcie decyzji blokujących
-SPEC-0001, uzupełnienie kontraktów i akceptacja zakresu. Nie wymagamy projektowania
-każdego przyszłego ekranu, konektora i silnika przed pierwszym przyrostem.
+Aktualizacja: po przygotowaniu kontraktów użytkownik zlecił realizację sprintów.
+Przeglądy techniczne, testy i dowody pozostają bramkami każdego przyrostu;
+nie wymagamy projektowania każdego przyszłego adaptera przed pierwszym kodem.

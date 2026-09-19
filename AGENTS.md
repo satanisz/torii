@@ -13,6 +13,11 @@ analiz i modeli. Obecny AutoML/Docker jest demonstracją, nie platformą produkc
   Naprawa błędu może rozszerzać istniejącą specyfikację; dodaj test regresyjny.
 - Nie traktuj statusów Draft/Proposed jako zatwierdzenia. Nie zatwierdzaj sam
   własnej specyfikacji ani nie przypisuj użytkownikowi nieudzielonej akceptacji.
+- Mandat użytkownika z 2026-09-19 opisuje `docs/platform/delivery-mandate.md`.
+  Upoważnia do autonomicznej realizacji lokalnych sprintów, commitów i agentów.
+  W jego granicach status Accepted (delegated) wymaga zapisanej specyfikacji
+  przed kodem oraz technicznego przeglądu; nie oznacza ludzkiego audytu ani release.
+  Drobne zadania deleguj z rozłączną własnością plików, a wyniki zweryfikuj.
 - Zmiana zakresu, modelu danych, bezpieczeństwa albo kontraktu wymaga aktualizacji
   specyfikacji przed kodem; istotna decyzja architektoniczna wymaga ADR.
 - Prototyp badawczy wymaga opisanego pytania, ograniczenia czasu i kryterium
@@ -36,5 +41,5 @@ analiz i modeli. Obecny AutoML/Docker jest demonstracją, nie platformą produkc
   ani zasad ochrony gałęzi w ramach samego planowania/przeglądu.
 - Obowiązujące ustawienia stacji opisuje `docs/local-installation.md`.
 
-Plan architektury jest propozycją do przeglądu. Reguła pracy spec-first wynika
-z bezpośredniego wymagania właściciela produktu i obowiązuje już teraz.
+Baseline technologiczny jest przyjęty do lokalnej realizacji zgodnie z mandatem.
+Reguła spec-first i wszystkie bramki jakości nadal obowiązują.

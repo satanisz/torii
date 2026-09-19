@@ -1,6 +1,7 @@
 # ADR-0002: repozytoria i autorytatywne źródła danych
 
-Status: Proposed. Data: 2026-09-19. Akceptujący: nie wskazano.
+Status: Accepted (delegated). Data: 2026-09-19.
+Podstawa: [mandat realizacji](../docs/platform/delivery-mandate.md).
 
 ## Kontekst i alternatywy
 

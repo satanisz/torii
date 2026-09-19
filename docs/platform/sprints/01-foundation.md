@@ -1,6 +1,7 @@
 # SP-01 — platforma, tożsamość i pierwszy działający ekran
 
-Status: Planned; **nie Ready**. Zależność: odebrany [SP-00](00-contracts.md).
+Status: **In progress**, start na podstawie [mandatu](../delivery-mandate.md)
+i kontraktów [SP-00](00-contracts.md). Nie jest to odbiór runtime.
 Specyfikacje wymagane przed kodem: Accepted SPEC-0001, SPEC-0002 i SPEC-0017.
 Cel: użytkownik loguje się do Torii i widzi wyłącznie dostępne mu projekty.
 To pierwszy pionowy przyrost obejmujący infrastrukturę, API, bazę i UI.

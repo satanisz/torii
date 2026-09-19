@@ -6,8 +6,8 @@ Powiązanie ze sprintami: [plan](../docs/platform/sprint-plan.md).
 
 | ID | Zakres | Stan dokumentu | Przygotować przed | Plan użycia |
 |---|---|---|---|---|
-| SPEC-0001 | Projekty, uprawnienia i wersje definicji | [Draft 0.1](0001-project-object-version/README.md) | SP-01 | SP-01–02 |
-| SPEC-0002 | Engineering baseline: repo, CI, konfiguracja, obrazy, migracje, testowe środowiska, observability | Zarezerwowany; brak dokumentu | SP-01 | SP-01–02, rozszerzenia później |
+| SPEC-0001 | Projekty, uprawnienia i wersje definicji | [Accepted (delegated) 0.2](0001-project-object-version/README.md) | SP-01 | SP-01–02 |
+| SPEC-0002 | Engineering baseline: repo, CI, konfiguracja, obrazy, migracje, testowe środowiska, observability | [Accepted (delegated) 0.1](0002-engineering-baseline/README.md) | SP-01 | SP-01–02, rozszerzenia później |
 | SPEC-0003 | Artefakty, CSV/Parquet, snapshoty i bezpieczny preview | Zarezerwowany; brak dokumentu | SP-03 | SP-03 |
 | SPEC-0004 | Izolowane wykonania, transformacje Python, próby i recovery | Zarezerwowany; brak dokumentu | SP-04 | SP-04 |
 | SPEC-0005 | Connection, SQL read-only, spójny odczyt i jakość danych | Zarezerwowany; brak dokumentu | SP-05 | SP-05 |
@@ -22,7 +22,7 @@ Powiązanie ze sprintami: [plan](../docs/platform/sprint-plan.md).
 | SPEC-0014 | Import dziedzictwa AutoML/FrameML i odwracalna migracja | Zarezerwowany; brak dokumentu | SP-14 | SP-14 |
 | SPEC-0015 | Kwalifikacja firmowego środowiska, bezpieczeństwo, wydajność, DR i eksploatacja | Zarezerwowany; brak dokumentu | SP-15; discovery od SP-00 | SP-15 |
 | SPEC-0016 | Opcjonalna projekcja DataHub i reconciliation | Zarezerwowany; brak dokumentu | Przed implementacją adaptera | Kandydat po SP-11; poza obowiązkowym celem SP-11 |
-| SPEC-0017 | Identyfikacja Torii i wspólne kontrakty UX/design system | Zarezerwowany; brak dokumentu | SP-01 | SP-00 projekt; SP-01 implementacja; kolejne rozszerzenia |
+| SPEC-0017 | Identyfikacja Torii i wspólne kontrakty UX/design system | [Accepted (delegated) 0.1](0017-interface-foundation/README.md) | SP-01 | SP-00 projekt; SP-01 implementacja; kolejne rozszerzenia |
 
 SPEC-0001 obejmuje całość dwóch przyrostów; częściowy odbiór SP-01 nie nadaje
 jej statusu Verified. SPEC-0002 musi być zaakceptowana przed kodem CI i

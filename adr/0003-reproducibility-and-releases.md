@@ -1,6 +1,7 @@
 # ADR-0003: niezmienne wersje, replay i kontrolowane wydania
 
-Status: Proposed. Data: 2026-09-19. Akceptujący: nie wskazano.
+Status: Accepted (delegated). Data: 2026-09-19.
+Podstawa: [mandat realizacji](../docs/platform/delivery-mandate.md).
 
 ## Kontekst i alternatywy
 

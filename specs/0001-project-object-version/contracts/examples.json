@@ -1,0 +1,229 @@
+{
+  "description": "Synthetic contract fixtures. Schema validation is not server authorization or SQL validation.",
+  "valid": [
+    {
+      "id": "dataset-csv",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "dataset",
+        "source": {
+          "connector": "file",
+          "format": "csv",
+          "binding": "deliveries"
+        }
+      }
+    },
+    {
+      "id": "dataset-parquet",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "dataset",
+        "source": {
+          "connector": "file",
+          "format": "parquet",
+          "binding": "prepared"
+        }
+      }
+    },
+    {
+      "id": "dataset-sql",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "dataset",
+        "source": {
+          "connector": "postgresql",
+          "connection_binding": "warehouse",
+          "query": "SELECT order_id FROM deliveries WHERE day >= :min_day",
+          "parameters": {
+            "min_day": "2026-09-01"
+          }
+        }
+      }
+    },
+    {
+      "id": "transformation-python",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "transformation",
+        "implementation": {
+          "language": "python",
+          "module": "delivery_project.features",
+          "callable": "prepare"
+        },
+        "inputs": [
+          {
+            "name": "raw",
+            "data_kind": "tabular",
+            "dataset_object_id": "10000000-0000-4000-8000-000000000001"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "prepared",
+            "data_kind": "tabular"
+          }
+        ],
+        "parameters": {
+          "drop_duplicates": true
+        }
+      }
+    },
+    {
+      "id": "transformation-sql",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "transformation",
+        "implementation": {
+          "language": "sql",
+          "connection_binding": "warehouse",
+          "query": "SELECT order_id FROM input_deliveries"
+        },
+        "inputs": [
+          {
+            "name": "input_deliveries",
+            "data_kind": "tabular"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "prepared",
+            "data_kind": "tabular"
+          }
+        ],
+        "parameters": {}
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "id": "unsupported-schema",
+      "base": "dataset-csv",
+      "pointer": "/schema_version",
+      "value": "9.0"
+    },
+    {
+      "id": "unknown-field",
+      "base": "dataset-csv",
+      "pointer": "/credentials",
+      "value": "forbidden-example"
+    },
+    {
+      "id": "unsupported-format",
+      "base": "dataset-csv",
+      "pointer": "/source/format",
+      "value": "xlsx"
+    },
+    {
+      "id": "missing-binding",
+      "base": "dataset-csv",
+      "pointer": "/source/binding",
+      "remove": true
+    },
+    {
+      "id": "absolute-path-as-binding",
+      "base": "dataset-csv",
+      "pointer": "/source/binding",
+      "value": "C:/private/data.csv"
+    },
+    {
+      "id": "malformed-uuid",
+      "base": "transformation-python",
+      "pointer": "/inputs/0/dataset_object_id",
+      "value": "not-a-uuid"
+    },
+    {
+      "id": "invalid-python-module",
+      "base": "transformation-python",
+      "pointer": "/implementation/module",
+      "value": "../unsafe.py"
+    },
+    {
+      "id": "empty-outputs",
+      "base": "transformation-python",
+      "pointer": "/outputs",
+      "value": []
+    },
+    {
+      "id": "wrong-port-kind",
+      "base": "transformation-python",
+      "pointer": "/outputs/0/data_kind",
+      "value": "executable"
+    },
+    {
+      "id": "nested-parameters",
+      "base": "transformation-python",
+      "pointer": "/parameters/drop_duplicates",
+      "value": {
+        "arbitrary": "object"
+      }
+    },
+    {
+      "id": "unsafe-integer",
+      "base": "dataset-sql",
+      "pointer": "/source/parameters/min_day",
+      "value": 9007199254740992
+    },
+    {
+      "id": "empty-query",
+      "base": "dataset-sql",
+      "pointer": "/source/query",
+      "value": ""
+    },
+    {
+      "id": "mixed-implementation",
+      "base": "transformation-python",
+      "pointer": "/implementation/query",
+      "value": "SELECT 1"
+    }
+  ],
+  "canonical": [
+    {
+      "id": "csv-order-independent",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "dataset",
+        "source": {
+          "connector": "file",
+          "format": "csv",
+          "binding": "deliveries"
+        }
+      },
+      "expected": "{\"kind\":\"dataset\",\"schema_version\":\"1.0\",\"source\":{\"binding\":\"deliveries\",\"connector\":\"file\",\"format\":\"csv\"}}"
+    },
+    {
+      "id": "sql-string-preserved",
+      "definition": {
+        "schema_version": "1.0",
+        "kind": "dataset",
+        "source": {
+          "connector": "postgresql",
+          "connection_binding": "warehouse",
+          "query": "SELECT order_id FROM deliveries WHERE day >= :min_day",
+          "parameters": {
+            "min_day": "2026-09-01"
+          }
+        }
+      },
+      "expected": "{\"kind\":\"dataset\",\"schema_version\":\"1.0\",\"source\":{\"connection_binding\":\"warehouse\",\"connector\":\"postgresql\",\"parameters\":{\"min_day\":\"2026-09-01\"},\"query\":\"SELECT order_id FROM deliveries WHERE day >= :min_day\"}}"
+    }
+  ],
+  "semantic_only": [
+    {
+      "id": "cross-project-reference",
+      "base": "transformation-python",
+      "expected": "422 invalid_reference",
+      "note": "UUID is syntactically valid but refers to project P2; requires runtime DB/authorization test."
+    },
+    {
+      "id": "duplicate-port-name",
+      "base": "transformation-python",
+      "expected": "422 validation_failed",
+      "note": "Duplicate named ports are a domain invariant, not covered by JSON Schema uniqueItems."
+    },
+    {
+      "id": "last-owner-race",
+      "expected": "409 last_owner",
+      "note": "Requires concurrent transactions, not schema validation."
+    }
+  ]
+}
