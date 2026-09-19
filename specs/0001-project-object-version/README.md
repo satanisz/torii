@@ -12,6 +12,10 @@ przyjęty osobno po review. Bez JWT/OIDC/HTTP; cały SPEC nadal nie jest Verifie
 Wykonane dowody częściowe: [B1](../../docs/platform/sp-01-b1-evidence.md) i
 [B2a1](../../docs/platform/sp-01-b2a1-evidence.md). Poniższa macierz opisuje pełne
 scenariusze produktu, nie zastępuje raportów ograniczonych przyrostów.
+Przyrost [B2a2](increment-b2a2.md): offline podpisy JWT, ścisłe claims i publiczne
+klucze, bez transportu OIDC, cache ani integracji logowania. D02 lokalnego profilu
+przyjęte po review exact-tag źródeł; nadal potrzebne realne Keycloak E2E.
+Dowód komponentu offline: [raport B2a2](../../docs/platform/sp-01-b2a2-evidence.md).
 
 Wymagania: FR-01, FR-02, część FR-11/FR-12, NFR-01/04/07/08/09/10.
 ADR: [0001](../../adr/0001-platform-boundaries.md),

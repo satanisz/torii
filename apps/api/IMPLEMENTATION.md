@@ -82,6 +82,27 @@ that limitation requires a separate corporate decision before deployment.
 No JWT verification, code exchange, HTTP/CSRF, Keycloak login E2E or restart/
 restore is proved by this increment. Evidence: `docs/platform/sp-01-b2a1-evidence.md`.
 
+### B2a2: offline token verification
+
+`security/oidc_keys.py` and `security/oidc_tokens.py` implement the separately
+reviewed `specs/0001-project-object-version/increment-b2a2.md` profile. A static
+issuer-bound public JWKS is parsed with byte/depth/node/numeric limits; only
+qualified RSA signing keys are selected. Parsing does not prove key provenance.
+The future transport must supply keys from the trusted issuer, never a request.
+
+PyJWT/cryptography verify actual RS256 signatures; Torii enforces strict claim
+types and required fields, issuer/audience/azp, clock skew, separate access/ID
+types and login nonce/at_hash bindings. The Identity result carries no grants.
+`token_key_id` is only an untrusted bounded lookup hint, not authentication.
+Errors and reprs do not expose token/key data or exception context.
+
+The test profile was checked against exact-tag Keycloak26.7.4 source and local
+image metadata, not a newly issued token. Tests sign synthetic tokens with
+ephemeral in-memory RSA keys. No discovery/JWKS fetch/cache, code exchange,
+HTTP/session integration, login E2E or deployment is proved by these tests.
+B2a3 must implement the separately reviewed network boundary before B2b routes.
+Executed evidence and limitations: `docs/platform/sp-01-b2a2-evidence.md`.
+
 ## Increment C: integrated journey
 
 Connect frontend and isolated Keycloak/DB stack, validate real multiple-user

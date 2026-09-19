@@ -6,7 +6,10 @@ Nie zmienia samodzielnie semantyki 0.4, OpenAPI 0.2.0 ani statusu AC runtime.
 
 Wyjątek wydzielony po review: [B2a1 — trwały stan](increment-b2a1.md) ma status
 Accepted (delegated) i obejmuje B2-D01/D03 oraz wskazany podzbiór D06.
-Pozostałe decyzje, adapter JWT/OIDC i fasada HTTP nadal są Proposed.
+Osobno przyjęty [B2a2 — offline JWT/JWKS](increment-b2a2.md) rozstrzyga D02
+dla źródłowego lokalnego profilu i kolejny podzbiór D06. Nie obejmuje transportu
+discovery/cache/code exchange, który wymaga B2a3. Pozostałe decyzje i fasada
+HTTP nadal są Proposed; źródła Keycloak nie zastępują realnego Code+PKCE E2E.
 Dowody B2a1 nie zaliczają całych B2-AC03/04 ani loginu end-to-end.
 
 ## Cel, zależności i granica
