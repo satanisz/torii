@@ -8,6 +8,12 @@ Nie oznacza to akceptacji wszystkich ADR, kontraktów ani terminu dostarczenia.
 
 ## Zasady planowania
 
+Aktualizacja priorytetu2026-09-19: użytkownik zlecił najpierw ręcznie testowalny
+koncept i dopuścił ograniczenie zakresu. Osobny
+[SPEC-0018](../../specs/0018-concept-demo/README.md) realizuje demo pionowe
+CSV→transformacja→model→MLflow→wynik wGUI. Nie wymaga wcześniejszego ukończenia
+SP-01–15 i nie zalicza ich enterpriseAC. Roadmapa poniżej zostaje celem docelowym.
+
 Proponowany rytm: dwa tygodnie na iterację, ze wspólnym celem i demonstracją
 wyniku. **Nie mnożymy liczby sprintów przez dwa tygodnie jako obietnicy terminu**:
 nie znamy dostępnej przepustowości ani obsady review/utrzymania.

@@ -1,5 +1,28 @@
 # Dziennik realizacji Torii
 
+## Aktualny priorytet — demonstrator SPEC-0018 (2026-09-19)
+
+Nowa dyspozycja użytkownika zastępuje najbliższy krok B2a4b: doprowadzić
+do ręcznie testowalnej aplikacji prezentującej koncept, nawet z mniejszym
+zakresem. [SPEC-0018](../../specs/0018-concept-demo/README.md) i
+[ADR-0004](../../adr/0004-local-concept-demo.md) Accepted (delegated) po
+niezależnym review. Osobny jawny local-demo, nie bypass istniejącego API.
+Demonstrator uruchomiony i zweryfikowany: CSV/synthetic→transformacja→Ridge/baseline→MLflow→porównanie,
+jedna aplikacja React/FastAPI, izolowany SQLite/worker. Nie zalicza SP-01–15.
+Kod, specyfikacja i testy: lokalny commit `e44d6d5` (bez push).
+Nie wracać automatycznie do enterprise OIDC przed zakończeniem tego celu.
+Dalsze wpisy historyczne pozostają dowodami, nie aktualnym priorytetem.
+
+Odbiór lokalny:54 demo backend +68 frontend PASS, regresja1400 enterprise backend
+PASS, niezależny review GREEN. Realbrowser projekt→synthetic160→transform155→
+Ridge i baseline, dwie rzeczywiste analizy/MLflow, export i restart PASS.
+Uruchomione http://127.0.0.1:18440; [instrukcja](../../apps/demo/README.md),
+[dokładne dowody i ograniczenia](../../specs/0018-concept-demo/evidence.md).
+Najbliższy etap to ręczne testy i feedback użytkownika, nie rozbudowa bez końca.
+Nie uznawać enterprise sprintów za ukończone na podstawie demonstratora.
+Automatyzacja `torii-realizacja-sprint-w`: PAUSED po osiągnięciu lokalnego celu;
+nie wznawiać dalszej rozbudowy bez nowej dyspozycji użytkownika.
+
 ## 2026-09-19 — start mandatu autonomicznego
 
 Baseline planu: `a7b19a5`. SP-00: kontrakty OpenAPI/JSON Schema i specyfikacje

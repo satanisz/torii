@@ -10,6 +10,14 @@ OIDC/project services and the object-management API are not integrated yet;
 this is not a production-ready enterprise platform.
 The repository is https://github.com/satanisz/torii.
 
+## Local concept demonstrator
+
+The separate [Torii demo](apps/demo/README.md) provides a real end-to-end path:
+CSV → versioned data → transformation → Ridge/baseline → MLflow → results in React.
+From this directory run `.\scripts\demo.ps1`, then open **http://127.0.0.1:18440**.
+Local, single-operator, no SSO; synthetic/non-sensitive data only. It does not
+use the legacy Docker services or mark the enterprise roadmap complete.
+
 ## Enterprise platform planning — spec first
 
 The target is a multi-user corporate platform, not a single-user application.

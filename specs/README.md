@@ -23,6 +23,7 @@ Powiązanie ze sprintami: [plan](../docs/platform/sprint-plan.md).
 | SPEC-0015 | Kwalifikacja firmowego środowiska, bezpieczeństwo, wydajność, DR i eksploatacja | Zarezerwowany; brak dokumentu | SP-15; discovery od SP-00 | SP-15 |
 | SPEC-0016 | Opcjonalna projekcja DataHub i reconciliation | Zarezerwowany; brak dokumentu | Przed implementacją adaptera | Kandydat po SP-11; poza obowiązkowym celem SP-11 |
 | SPEC-0017 | Identyfikacja Torii i wspólne kontrakty UX/design system | [Accepted (delegated) 0.1](0017-interface-foundation/README.md) | SP-01 | SP-00 projekt; SP-01 implementacja; kolejne rozszerzenia |
+| SPEC-0018 | Lokalny demonstrator konceptu CSV→transformacja→regresja→MLflow→GUI | [Accepted (delegated)](0018-concept-demo/README.md) | Nowy priorytet użytkownika | Osobny demo, nie odbiór enterprise sprintów |
 
 SPEC-0001 obejmuje całość dwóch przyrostów; częściowy odbiór SP-01 nie nadaje
 jej statusu Verified. SPEC-0002 musi być zaakceptowana przed kodem CI i
