@@ -171,3 +171,58 @@ SP-01 nadal **w realizacji**, SPEC-0001/0002/0017 bez pełnego Verified.
    pozostają obowiązkowe przed zamknięciem SP-01. Bez przejścia do SP-02.
 4. Kontynuacja lokalna nie wymaga obecnie decyzji użytkownika; automatyzacja
    pozostaje aktywna. Nie markować całej roadmapy ani enterprise jako gotowych.
+
+## 2026-09-19 — B2a2: offline JWT/JWKS (heartbeat)
+
+Commit **`826479f`**: weryfikacja podpisów i claims JWT, oddzielne ścieżki
+access oraz login ID+access, niemutowalny publiczny zestaw kluczy związany
+z issuer. Przed kodem przyjęto spec B2a2 po niezależnym review; lokalny profil
+D02 sprawdzono w exact-tag źródłach Keycloak26.7.4 i metadanych obrazu.
+Nie jest to obserwacja tokenu ani dowód runtime konfiguracji IdP.
+
+Nowy kod korzysta z istniejącego PyJWT/cryptography i nie dodaje zależności,
+HTTP, DB writes, transportu sieciowego lub deploy. Bounded parsing odrzuca
+duplicate JSON/niekanoniczne base64, złe klucze i header extensions. Access/ID
+mają rozłączne reguły, nonce/at_hash i sprawdzanie czasu; wynik nie nadaje praw.
+Limit128 znaków literału liczbowego zapisano i przejrzano przed poprawką parsera;
+regresje najpierw RED. Nie zmieniano globalnych limitów Pythona.
+
+Root `./scripts/check-platform-foundation.ps1 -IncludePostgres`: **PASS**:
+**885 backend bez DB + 53 real PostgreSQL + 50 frontend**. Nowe testy offline356;
+PG to niezmienione23 B1 +30 B2a1, nie dowód integracji JWT z DB. Run
+`3545abbbdb7043cea6562b27453708f4`:53 PASS,88.76s, bez skipów. Ruff/format46
+plików, strict mypy25 source files, kontrakty/JCS/API drift, frontend lint/
+types/build, audyty zależności i35 PowerShell checks PASS. Dwa znane deprecation
+warnings i rekomendacja pip-audit dot. hashy pozostają jawne.
+
+Reviewer niezależnie uruchomił356 nowych testów: PASS; końcowy review GREEN,
+bez pozostałych findings dla zakresu offline. Klucze/prywatne materiały fixture
+tylko w RAM. To review agenta i realna kryptografia syntetycznych tokenów,
+nie audyt człowieka ani E2E. [Pełne dowody](sp-01-b2a2-evidence.md).
+
+Własny kontener/sieć runu usunięto po guardach, syntetyczny tmpfs odrzucono;
+brak pozostawionych zasobów b1-integration. Stary stack zdrowy i niezmieniony.
+Root `.env`, legacy/trwałe wolumeny, zasoby firmy i remote nienaruszone;
+brak push/PR. Scoped staged check13 znanych lokalnych sekretów PASS, nie jest
+pełnym skanem historii. API nadal działa na starszym obrazie fundamentu.
+
+### Następny krok — B2a3, bez powtarzania ukończonych komponentów
+
+1. Wydzielić z Proposed B2 spec transportu discovery/JWKS/code exchange,
+   review przed kodem. D06: dokładne origin/realm endpoints, brak redirectów/
+   proxy env i URL z JWT, bounded body/deadline, brak automatycznego retry POST.
+2. Zdefiniować cache per issuer/proces: TTL monotoniczny<=5min, single-flight,
+   unknown-kid refresh<=1/30s także po awarii, atomowe zastąpienie kluczy,
+   fail-closed bez ważnego cache; testy rotacji/removal/outage i storm.
+   Wykorzystać B2a2 SigningKeys/TokenVerifier, nie implementować ich ponownie.
+3. Code exchange/revocation: konsumowany B2a1 flow commit PRZED siecią,
+   wspólny deadline, nonce/at_hash verification, brak sekretów w błędach/logach.
+   Callback/provisioning/sesja i HTTP B2b później po własnych kontraktach;
+   nie podłączać niezweryfikowanych raw claims do IdentityStore.
+4. Wciąż brak full B2-AC01 (łączenie z persistence), B2-AC02/05/06/07,
+   prawdziwego Keycloak/UI/raw API E2E i pozostałych bramek SP-01 (DR, NFR,
+   limiter/metryki/retencja, pełne skany/SBOM i ręczne UX/a11y). Nie zaliczać
+   loginu na podstawie offline podpisów, discovery czy zdrowego kontenera.
+5. SP-01 w realizacji, cały SPEC-0001/0002/0017 nie Verified, SP-02 jeszcze
+   nie rozpoczynać. Lokalny następny przyrost nie wymaga decyzji firmy;
+   automatyzacja kontynuacji pozostaje aktywna, bez udawania odbioru enterprise.

@@ -1,6 +1,6 @@
 # SP-01 B2a2 — offline JWT i publiczne klucze
 
-2026-09-19. Baseline `4189968`. Zakres:
+2026-09-19. Baseline `4189968`; kod/spec/testy: **`826479f`**. Zakres:
 [SPEC B2a2](../../specs/0001-project-object-version/increment-b2a2.md),
 Accepted (delegated) po niezależnym przeglądzie przed kodem.
 To odbiór komponentu offline, nie działającego logowania ani całego SP-01.
@@ -79,6 +79,9 @@ kodu — **PASS, exit0**.
   Linux28.5.2/desktop-linux. Niezmieniony pinned PostgreSQL17 z locka obrazów
   i guarded harness B1, nowa migrowana baza na test, operacje kontem runtime.
   Stary test stack API/identity/database pozostał healthy, ale bez deploy nowego kodu.
+- Staged diff check i scoped check13 znanych lokalnych sekretów: PASS, bez
+  wypisywania wartości. Brak staged `.env`/`.local` i wybranych wzorców kluczy.
+  Nie jest to pełny skan repo/historii; ta bramka pozostaje do wykonania.
 
 ## Niewykonane i następny krok
 
