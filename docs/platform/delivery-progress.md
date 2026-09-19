@@ -281,3 +281,49 @@ nie przepisywano ukończonych B1/B2a1/B2a2. Nie jest to blokada decyzją firmy.
    Nie rozpoczynać SP-02, nie ogłaszać enterprise ani pełnego loginu.
 5. Kolejny lokalny przyrost nie wymaga decyzji użytkownika. Kontynuacja pozostaje
    aktywna; nie wstrzymywać automatyzacji z powodu samego podziału prac na przyrosty.
+
+## 2026-09-19 — B2a4a: kodowanie i parsowanie komunikatów OAuth
+
+Commit **`0e8de81`**: czysty encoder form/client_secret_basic oraz parser
+bounded niezaufanych tokenów i odpowiedzi revocation. Stałe cele/callback,
+canonical PKCE, ścisłe typy/limity, brak parameter injection i pól w repr.
+Bez I/O, DB, tras, konfiguracji, nowych zależności ani deploy. To komponent
+do wymiany kodu, nie wykonana wymiana, zweryfikowana tożsamość lub login.
+
+Spec Accepted (delegated) po review PRZED implementacją, wszystkie trzy pliki
+testów zaczęły RED. Agenci: rozłączne parser/testy oraz niezależne attack vectors;
+root: encoder/integracja. Końcowy contract_review GREEN, niezależnie314 PASS.
+Pełna bramka root `./scripts/check-platform-foundation.ps1 -IncludePostgres`:
+**1400 backend +53 PostgreSQL +50 frontend PASS**, exit0. Nowych314 testów.
+PG run `6c68a08b3558470b87e65362828fe98e`:53 PASS89.78s, regresja B1/B2a1,
+nie integracja OAuth z DB. Ruff/format57, mypy30, kontrakty/JCS/API drift,
+FE lint/types/build, audyty zależności i35 kontroli PowerShell PASS.
+Dwa znane deprecation warnings i rekomendacja pip-audit dotycząca hashy jawne.
+[Dowody, źródła i granice](sp-01-b2a4a-evidence.md).
+
+Własny kontener/sieć usunięte po guardach, syntetyczny tmpfs odrzucony;
+brak zasobów b1-integration po runie. Scoped staged check13 sekretów PASS,
+nie pełny skan historii. Root `.env`, legacy/trwałe zasoby, istniejący stack,
+firma/remote nienaruszone, brak push/PR. API nie zostało wdrożone na nowo.
+
+### Następny krok — B2a4b, bez powtarzania komunikatów A4a
+
+1. ADR + spec i niezależny review przed kodem bounded POST oraz polityki
+   logowania przy starcie procesu. Bez automatycznych retry, proxy env,
+   redirects/cookies, provider exception chains i sekretów w logach. Transport
+   sam egzekwuje fixed URL nawet dla ręcznie skonstruowanego OAuthRequest.
+2. Wstępny review zaleca jawne wyłączenie emitujących loggerów HTTPX/HTTPCore
+   przy starcie i fail-closed guard przed credentials I/O. Koszt całego procesu
+   wymaga ADR. Źródłowe nazwy i upgrade guard opisane w raporcie A4a.
+   Nie zmieniono jeszcze logging; Uvicorn/gateway/APM osobno przed B2b.
+3. Przed real Code+PKCE/replay testami ustalić politykę logów testowego IdP:
+   Keycloak26.7.4 PkceUtils DEBUG ujawnia verifier, OAuth2CodeParser WARN przy
+   replay składniki zużytego kodu. Nie dumpować raw logów jako artefaktów testu.
+4. Osobna spec orchestration: consume_flow commit PRZED HTTP, deadline z rezerwą
+   cleanup, B2a2 podpisy/nonce/at_hash/sub przed sesją, szyfrowany refresh,
+   best-effort revoke bez auto-refresh. HTTP/cookie/CSRF/projekty, izolowany
+   bootstrap i prawdziwe Keycloak/UI/raw API E2E pozostają B2b.
+5. SP-01 In progress; SPEC-0001/0002/0017 nie Verified. Całe B2-AC01/02/03/04
+   nadal częściowe, B2-AC05/06/07, DR/NFR/retencja/limiter/metryki, pełne skany/
+   SBOM i UX/a11y pozostają otwarte. Nie rozpoczynać SP-02 ani ogłaszać enterprise.
+   Bez nowej wymaganej decyzji użytkownika, automatyzacja kontynuacji aktywna.
