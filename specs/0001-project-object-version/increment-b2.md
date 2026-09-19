@@ -4,6 +4,11 @@ Status: **Proposed**, 2026-09-19. Autor propozycji: agent `contract_review`.
 Wymaga niezależnego przeglądu integratora przed Accepted (delegated) i kodem.
 Nie zmienia samodzielnie semantyki 0.4, OpenAPI 0.2.0 ani statusu AC runtime.
 
+Wyjątek wydzielony po review: [B2a1 — trwały stan](increment-b2a1.md) ma status
+Accepted (delegated) i obejmuje B2-D01/D03 oraz wskazany podzbiór D06.
+Pozostałe decyzje, adapter JWT/OIDC i fasada HTTP nadal są Proposed.
+Dowody B2a1 nie zaliczają całych B2-AC03/04 ani loginu end-to-end.
+
 ## Cel, zależności i granica
 
 Połączyć rzeczywistą tożsamość z trwałą usługą projektów B1, bez debug identity,

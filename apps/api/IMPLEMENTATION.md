@@ -53,6 +53,35 @@ the dedicated harness does not count skipped database tests as verification.
 B1 does not cover process/database restart, restore, HTTP/OIDC or UI journeys.
 See `docs/platform/sp-01-b1-evidence.md` for executed evidence and remaining gates.
 
+### B2a1: internal identity and session persistence
+
+`domain/identity.py`, `security/session_secrets.py` and
+`application/identity_store.py` implement the separately reviewed
+`specs/0001-project-object-version/increment-b2a1.md`. This selects only the
+durable-state subset of B2; the remaining B2 proposal is not accepted by it.
+
+Identity is an internal DTO, **not a verified token**. No caller-facing routes
+were added. A future trusted JWT/OIDC adapter must establish issuer/subject
+provenance before calling the store. Synthetic fixtures are not an auth bypass.
+The runtime uses the existing migration and least-privileged database role.
+
+- Canonical 256-bit credentials; stored hashes and purpose/record-bound Fernet
+  ciphertext, redacted result reprs and safe crypto errors.
+- Browser-bound, single-use login flows with database-clock expiry and commit
+  before returning exchange material; no network calls in the store.
+- Unique issuer/subject provisioning without grants or reactivation; atomic
+  session creation and rotation, absolute 8h/idle 30min, current local active/grant
+  checks, issuer isolation and lock order that avoids auth/login deadlock.
+- Local revocation commits before releasing refresh material. Corrupt refresh
+  does not block local deletion, but database/commit failures still roll back.
+- Bounded expired-state cleanup, at most 100 flows and 100 sessions per call;
+  no background job or business-data retention policy introduced.
+
+The local session does not automatically follow federated IdP revocation;
+that limitation requires a separate corporate decision before deployment.
+No JWT verification, code exchange, HTTP/CSRF, Keycloak login E2E or restart/
+restore is proved by this increment. Evidence: `docs/platform/sp-01-b2a1-evidence.md`.
+
 ## Increment C: integrated journey
 
 Connect frontend and isolated Keycloak/DB stack, validate real multiple-user
