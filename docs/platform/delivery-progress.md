@@ -119,3 +119,55 @@ SP-01 nadal **w realizacji**, cały SPEC-0001/0002/0017 bez statusu Verified.
 4. Nie przechodzić do SP-02 przed obowiązkowymi bramkami SP-01. Firma nie jest
    potrzebna do następnego lokalnego przyrostu, lecz pozostaje warunkiem
    odbioru enterprise. Automatyzacja kontynuacji pozostaje aktywna.
+
+## 2026-09-19 — B2a1: trwały stan sesji (heartbeat)
+
+Commit **`baa09bd`**: wewnętrzny Identity DTO, canonical credentials i związane
+z rekordem szyfrowanie Fernet, trwały IdentityStore nad istniejącą migracją0001.
+Spec B2a1 przyjęta po technicznym review przed kodem, osobno od nadal Proposed
+reszty B2. Nie dodano JWT verifier, endpointów HTTP, auth bypass ani deploy.
+
+Zaimplementowano jednokrotne browser-bound flows, provisioning bez grantów,
+atomową rotację sesji, absolute8h/idle30min liczone zegarem DB po lockach,
+biezący status/grant principal, lokalny revoke i bounded cleanup. Zaufany
+issuer sprawdzany również przy sesji. Lokalny profil nie realizuje jeszcze
+natychmiastowego federacyjnego revoke z IdP; to jawna granica, nie obietnica.
+
+Root końcowo wykonał `./scripts/check-platform-foundation.ps1 -IncludePostgres`:
+**529 backend bez DB + 53 real PostgreSQL + 50 frontend PASS**. PostgreSQL:
+23 B1 +30 B2a1, run `03b28a5965ea4ec9954dc89734c1aea9`,86.04s, bez skipów.
+Ruff/format/strict mypy, kontrakty, lint/types/build, oba audyty zależności,
+35 kontroli PowerShell oraz staged diff check PASS. Dwa znane ostrzeżenia
+deprecation pozostały jawne. Zdalnego CI nie uruchamiano.
+
+Review zamknął dwa konkretne problemy: obcy trusted issuer przy starej sesji
+oraz mylenie operacyjnej awarii decrypt z corrupt ciphertext. Testy pure i PG
+potwierdzają fail-closed/no-touch, rollback i brak sekretów w błędach. Reviewer
+niezależnie powtórzył256 testów wartości/boundary. To przegląd agenta, nie audyt
+ludzki. Szczegółowy zakres i dowody: [raport B2a1](sp-01-b2a1-evidence.md).
+
+Własne efemeryczne kontenery/sieci usunięto po kontroli ID/etykiet; tmpfs z
+danymi syntetycznymi odrzucono. Nie zmieniono root `.env`, legacy wolumenów,
+trwałego stacku `test-abcdef012345`, zdalnego repo ani zasobów firmowych.
+Nie wykonano push/PR. Kontrola13 znanych lokalnych sekretów w staged diff PASS;
+nie zastępuje to pełnego skanu sekretów/historii. Testowy API nadal jest starym
+obrazem fundamentu; jego health nie potwierdza wdrożenia B1/B2a1.
+
+### Następny krok — nie powtarzać B1 ani B2a1
+
+SP-01 nadal **w realizacji**, SPEC-0001/0002/0017 bez pełnego Verified.
+
+1. B2a2: wydzielić i niezależnie przejrzeć spec JWT/OIDC transportu z planu B2:
+   D02 (profil tokenów przypiętego Keycloak), pozostałe limity D06, discovery/
+   JWKS/rotation, signature/audience/nonce/at_hash i code exchange. Dopiero po
+   review implementacja. Użyć B2a1 jako persistence; Identity jest DTO, a nie
+   dowodem sprawdzenia tokenu. Żadnych raw claims z requestów do store.
+2. B2b: osobne doprecyzowanie HTTP/callback/logout/CSRF, projekty FastAPI,
+   izolowany bootstrap oraz wieloużytkownikowy Keycloak/UI/raw API E2E.
+   Nie traktować mocka JWT, session store ani discovery health jako loginu.
+3. B2-AC03/04 mają dowód częściowy persistence, nie pełny callback/exchange;
+   B2-AC01/02/05/06/07 nadal niewykonane. Restart/restore, rate limits/metrics/
+   retencja, NFR, pełne skany images/licenses/secrets/SBOM, ręczne UX/a11y
+   pozostają obowiązkowe przed zamknięciem SP-01. Bez przejścia do SP-02.
+4. Kontynuacja lokalna nie wymaga obecnie decyzji użytkownika; automatyzacja
+   pozostaje aktywna. Nie markować całej roadmapy ani enterprise jako gotowych.

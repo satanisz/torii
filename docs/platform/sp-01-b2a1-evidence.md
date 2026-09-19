@@ -1,6 +1,6 @@
 # SP-01 B2a1 — trwały stan tożsamości i sesji
 
-2026-09-19. Baseline `9faf8ca`. Zakres:
+2026-09-19. Baseline `9faf8ca`; kod/spec/testy: **`baa09bd`**. Zakres:
 [SPEC B2a1](../../specs/0001-project-object-version/increment-b2a1.md),
 Accepted (delegated) po niezależnym review przed implementacją.
 Odbiór obejmuje wyłącznie wewnętrzne wartości i persistence, nie logowanie
@@ -105,6 +105,9 @@ Root wykonał po zamrożeniu kodu i review
   `desktop-linux`, PostgreSQL17 pinned digest
   `sha256:67f41722b7a8cbdb868a44a4995c846eddfdc2973bccb291ce937dce88ad5675`.
   Frozen toolchain z repo; zdalnego workflow nie uruchamiano.
+- Kontrola staged przed commitem:13 znanych lokalnych wartości sekretów nie
+  występuje w diff, brak prywatnych ścieżek `.env`/`.local` i wybranych wzorców
+  credentials; wartości nie były wypisywane. Nie jest to pełny skan repo/historii.
 
 ## Granice i następny krok
 
