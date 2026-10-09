@@ -1,7 +1,10 @@
 # SP-00 — kontrakty przyszłych prób technicznych
 
-Status: Draft. **Żadna próba nie jest wykonana ani Accepted**. Przed kodem
-i uruchomieniem wymaga akceptacji własnego zakresu. Dane syntetyczne, nowa
+Status kontraktów pełnych prób: Draft. Aktualizacja 2026-10-10: odrębna
+[SPEC-0020 / EXP-03a](../../specs/0020-model-workbench-trial/README.md)
+została przyjęta i wykonana; [wyniki](../../specs/0020-model-workbench-trial/evidence.md)
+nie zaliczają całego EXP-03. EXP-01/02 nadal niewykonane. Każdy kolejny zakres
+przed kodem i uruchomieniem wymaga własnego review. Dane syntetyczne, nowa
 instalacja testowa, brak dostępu do firmy i historycznych wolumenów demonstracji.
 Owner wyniku: platform/architekt; reviewer i konkretny wykonawca do wskazania.
 

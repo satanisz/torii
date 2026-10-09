@@ -1,6 +1,38 @@
 # Dziennik realizacji Torii
 
-## Aktualny priorytet planowania — platforma obiektów i graf 2026-10-10
+## Warsztat tworzenia modeli — SPEC-0020 / EXP-03a (2026-10-10)
+
+Użytkownik włączył Docker, zlecił skupienie na architekturze narzędzi modeli,
+następnie polecił kontynuować sprinty i commitować spójne zmiany. Powstała
+[mapa narzędzi i kolejnych przyrostów](model-tooling-architecture.md).
+
+Zaimplementowano odseparowany warsztat MLflow 3.14.0, PostgreSQL tracking/auth,
+S3 SeaweedFS oraz kontener treningowy; Caddy publikuje wyłącznie loopback.
+Worker nie ma sekretów DB/S3/admin ani sieci zewnętrznej. Root `.env`, stare
+wolumeny i pozostałe aplikacje Docker zachowano.
+
+Trzy treningi dały 12 zakończonych runów danych/transformacji/baseline/Ridge.
+Powtórka odtworzyła predykcje i metryki; zmiana danych zmieniła digest.
+Po restarcie pobrano 36 wcześniejszych artefaktów z poprawnymi hashami.
+MLflow SDK/API: 136 PASS, 0 FAIL, 1 NOT TESTED (kwalifikowany audyt).
+Ingress: anonimowe 401, konto A 200. 13 testów jednostkowych, Ruff, ograniczony
+mypy i zgodność 97 pakietów PASS. [Pełne dowody](../../specs/0020-model-workbench-trial/evidence.md).
+
+Stan: Verified wyłącznie dla lokalnej próby; **NO-GO dla bezpośredniej integracji
+enterprise**, ponieważ brak kwalifikacji audytu i tożsamości/polityk Torii.
+Manifesty są podstawą integracji grafu, nie działającym katalogiem obiektów.
+Nie zaliczono SP-01/SP-10 ani pełnego EXP-03. Badanie ACL nie zastępuje audytu firmy.
+
+Instancja `20261010ab01`: `http://127.0.0.1:18500`, login `analyst_a`, hasło tylko
+w lokalnym pliku. [Instrukcja operatora](../../deploy/experiments/mlflow-access/OPERATIONS.md).
+Przeglądy przed kodem i po implementacji: `regulated_examples`; dodatkowy
+review dokumentacji: `platform_state`. Bez push i bez wydania enterprise.
+
+Dotychczasowe przyrosty utrwalono w lokalnych commitach: `0eeb169` (SPEC-0019)
+i `634e991` (plan obiektów/grafu). Kolejne zadanie planu: SP-01-04a/B2a4b,
+żeby narzędzia modeli mogły później korzystać ze wspólnej tożsamości Torii.
+
+## Poprzedni etap planowania — platforma obiektów i graf 2026-10-10
 
 Użytkownik ocenił Torii jako zbyt dashboardowe i zlecił plan architektury
 enterprise z obiektami danych, transformacji i eksperymentów. Potwierdził,

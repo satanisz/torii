@@ -1,0 +1,6 @@
+# SPEC-0020. All transitive versions and hashes are frozen in requirements.lock.
+mlflow[auth]==3.14.0
+scikit-learn==1.9.1
+pandas>=2.3,<3
+psycopg2-binary>=2.9,<3
+boto3>=1.40,<2

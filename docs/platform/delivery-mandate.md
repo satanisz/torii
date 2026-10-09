@@ -46,6 +46,16 @@ Najpierw spójny flow CSV→transformacja→regresja→MLflow→porównanie wRea
 potem rozbudowa. Parquet/SQL/Jupyter/multiuser/rozbudowaneXAI odłożone.
 
 Źródłem bieżącego stanu jest [dziennik realizacji](delivery-progress.md).
+
+Aktualizacja 2026-10-10: użytkownik priorytetyzuje architekturę narzędzi do
+tworzenia modeli, potwierdził nowoczesny stos/graf zależności i udostępnił Docker.
+Najbliższy przyrost obejmuje wydzielony warsztat techniczny SPEC-0020/EXP-03a
+oraz dalszą integrację katalogu i wykonań według sprintów. Nie oznacza zgody
+na firmowe dane, produkcję, zmianę legacy ani zaliczenia gotowości enterprise.
+Użytkownik dodatkowo polecił nie przerywać realizacji sprintów oraz commitować
+każdy spójny przyrost według standardów. Kontynuacja lokalna i commity są jawnie
+zlecone; push nadal wymaga odrębnej dyspozycji.
+
 Każdy wpis rozróżnia implementację, wykonane kontrole i brakujące AC.
 Pełen sprint jest ukończony dopiero po spełnieniu jego obowiązkowych AC.
 Roadmapa nie jest obietnicą ukończenia platformy enterprise przez jedną noc.

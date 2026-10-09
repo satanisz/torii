@@ -1,0 +1,8 @@
+.local
+__pycache__
+.pytest_cache
+.ruff_cache
+.venv
+*.md
+*.ps1
+test_*.py

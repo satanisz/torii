@@ -15,7 +15,7 @@ Powiązanie ze sprintami: [plan](../docs/platform/sprint-plan.md).
 | SPEC-0007 | Zespoły, udostępnianie między projektami i prawa do zależności | Zarezerwowany; brak dokumentu | SP-07 | SP-07; rozszerzenie dla modeli SP-10 |
 | SPEC-0008 | Git, working copies, import/eksport definicji i konflikty | Zarezerwowany; brak dokumentu | SP-08 | SP-08 |
 | SPEC-0009 | SDK/CLI, lokalny replay i izolowane workspace Jupyter | Zarezerwowany; brak dokumentu | SP-09 | SP-09 |
-| SPEC-0010 | Eksperymenty MLflow, modele ML/nie-ML, bezpieczna publikacja | Zarezerwowany; brak dokumentu | SP-10 | SP-10 |
+| SPEC-0010 | Wersjonowany protokół eksperymentu, MLflow, modele ML/nie-ML, publikacja | Zarezerwowany; brak dokumentu | Przed SP-10A | SP-10A wąski eksperyment; SP-10B pełny rejestr według planu 0.2 |
 | SPEC-0011 | Analizy, ewaluacja, XAI, porównania i raporty | Zarezerwowany; brak dokumentu | SP-11 | SP-11 |
 | SPEC-0012 | Release bundle, dowody i zatwierdzanie digestu | Zarezerwowany; brak dokumentu | SP-12 | SP-12 |
 | SPEC-0013 | Deployment batch, środowiska, harmonogram i rollback | Zarezerwowany; brak dokumentu | SP-13 | SP-13 |
@@ -24,6 +24,8 @@ Powiązanie ze sprintami: [plan](../docs/platform/sprint-plan.md).
 | SPEC-0016 | Opcjonalna projekcja DataHub i reconciliation | Zarezerwowany; brak dokumentu | Przed implementacją adaptera | Kandydat po SP-11; poza obowiązkowym celem SP-11 |
 | SPEC-0017 | Identyfikacja Torii i wspólne kontrakty UX/design system | [Accepted (delegated) 0.1](0017-interface-foundation/README.md) | SP-01 | SP-00 projekt; SP-01 implementacja; kolejne rozszerzenia |
 | SPEC-0018 | Lokalny demonstrator konceptu CSV→transformacja→regresja→MLflow→GUI | [Accepted (delegated)](0018-concept-demo/README.md) | Nowy priorytet użytkownika | Osobny demo, nie odbiór enterprise sprintów |
+| SPEC-0019 | Finanse banku: syntetyczne portfele i GL, uzgodnienie, scenariusze NII, anomalie regułowe | [Accepted (delegated) 0.2](0019-bank-finance-lab/README.md) | Przed implementacją laboratorium finansowego | Lokalny przyrost demo; nie produkcyjny ALM |
+| SPEC-0020 | Warsztat modeli: MLflow, S3, worker, pochodzenie i próba ACL | [Accepted (delegated) 0.2](0020-model-workbench-trial/README.md) | EXP-03a przed integracją SP-10A | Odseparowana próba techniczna; wynik nie zalicza całego EXP-03 |
 
 SPEC-0001 obejmuje całość dwóch przyrostów; częściowy odbiór SP-01 nie nadaje
 jej statusu Verified. SPEC-0002 musi być zaakceptowana przed kodem CI i

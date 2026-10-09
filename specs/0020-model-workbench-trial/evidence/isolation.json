@@ -1,0 +1,112 @@
+{
+  "combined_memory_with_one_job": 3892314112,
+  "spec": "SPEC-0020",
+  "containers": [
+    {
+      "networks": [
+        "torii-exp03-20261010ab01_api",
+        "torii-exp03-20261010ab01_ingress"
+      ],
+      "nano_cpus": 250000000,
+      "memory_limit": 134217728,
+      "image_id": "sha256:acd2be229bed6e0edba016d90086663ea56403c38536bec887a9ea300ecac1f3",
+      "mounts": [],
+      "service": "gateway",
+      "name": "/torii-exp03-20261010ab01-gateway-1"
+    },
+    {
+      "networks": [
+        "torii-exp03-20261010ab01_api",
+        "torii-exp03-20261010ab01_backend"
+      ],
+      "nano_cpus": 1000000000,
+      "memory_limit": 1073741824,
+      "image_id": "sha256:f2bc51fe44368f3d36e48da8a591e0dde035edd6e1c1b86515ad552ece92a4a2",
+      "mounts": [
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/flask_key"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/s3_access"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/s3_secret"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/postgres_tracking"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/auth_config"
+        }
+      ],
+      "service": "mlflow",
+      "name": "/torii-exp03-20261010ab01-mlflow-1"
+    },
+    {
+      "networks": [
+        "torii-exp03-20261010ab01_backend"
+      ],
+      "nano_cpus": 500000000,
+      "memory_limit": 536870912,
+      "image_id": "sha256:aab112167b833e95abdc958661e49db8c35244718125f118e9550edd55e94a09",
+      "mounts": [
+        {
+          "writable": true,
+          "type": "volume",
+          "target": "/var/lib/postgresql/data"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/postgres_admin"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/postgres_tracking"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/postgres_auth"
+        }
+      ],
+      "service": "database",
+      "name": "/torii-exp03-20261010ab01-database-1"
+    },
+    {
+      "networks": [
+        "torii-exp03-20261010ab01_backend"
+      ],
+      "nano_cpus": 250000000,
+      "memory_limit": 536870912,
+      "image_id": "sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d",
+      "mounts": [
+        {
+          "writable": true,
+          "type": "volume",
+          "target": "/data"
+        },
+        {
+          "writable": false,
+          "type": "bind",
+          "target": "/run/secrets/s3_config"
+        }
+      ],
+      "service": "storage",
+      "name": "/torii-exp03-20261010ab01-storage-1"
+    }
+  ],
+  "combined_cpu_with_one_job": 4.0,
+  "status": "ok"
+}

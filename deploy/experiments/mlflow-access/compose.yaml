@@ -1,0 +1,140 @@
+# SPEC-0020; always invoked with explicit --env-file/-p/--project-directory.
+x-labels: &labels
+  io.torii.scope: exp03
+  io.torii.instance: ${TRIAL_ID:?provision first}
+x-job: &job
+  image: torii-exp03-${TRIAL_ID}:local
+  profiles: [tools]
+  read_only: true
+  tmpfs: ['/tmp:size=512m,mode=1777']
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 256
+  cpus: 2.0
+  mem_limit: 1536m
+  networks: [api]
+  labels: *labels
+  environment: &client-env
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+    MLFLOW_ENABLE_WORKSPACES: 'false'
+    MLFLOW_HTTP_REQUEST_TIMEOUT: '10'
+    MLFLOW_HTTP_REQUEST_MAX_RETRIES: '0'
+    MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR: 'false'
+    TORII_IMAGE_ID: ${TRIAL_IMAGE_ID:-not-recorded}
+
+services:
+  gateway:
+    image: torii-exp03-${TRIAL_ID}-gateway:local
+    build: {context: ., dockerfile: gateway.Dockerfile}
+    depends_on:
+      mlflow: {condition: service_healthy}
+    ports: ['127.0.0.1:${TRIAL_PORT:?provision first}:8080']
+    networks: [ingress, api]
+    labels: *labels
+    read_only: true
+    tmpfs: ['/tmp:size=16m,mode=1777', '/data:size=16m,mode=1777', '/config:size=4m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 0.25
+    mem_limit: 128m
+    pids_limit: 64
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, 'http://127.0.0.1:8080/health']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  database:
+    image: torii-exp03-${TRIAL_ID}-database:local
+    build: {context: ., dockerfile: database.Dockerfile}
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_admin
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    secrets: [postgres_admin, postgres_tracking, postgres_auth]
+    volumes:
+      - database:/var/lib/postgresql/data
+    networks: [backend]
+    labels: *labels
+    cpus: 0.5
+    mem_limit: 512m
+    pids_limit: 128
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U postgres -d postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  storage:
+    image: chrislusf/seaweedfs:4.48@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
+    command: [server, '-s3', '-s3.config=/run/secrets/s3_config', '-dir=/data', '-ip=storage', '-volume.max=16', '-master.volumeSizeLimitMB=100']
+    secrets: [s3_config]
+    volumes: [storage:/data]
+    networks: [backend]
+    labels: *labels
+    cpus: 0.25
+    mem_limit: 512m
+    pids_limit: 128
+    security_opt: [no-new-privileges:true]
+  mlflow:
+    image: torii-exp03-${TRIAL_ID}:local
+    build: {context: .}
+    command: [python, server.py]
+    depends_on:
+      database: {condition: service_healthy}
+      storage: {condition: service_started}
+    networks: [api, backend]
+    labels: *labels
+    secrets: [postgres_tracking, auth_config, flask_key, s3_access, s3_secret]
+    environment:
+      MLFLOW_ENABLE_WORKSPACES: 'false'
+      MLFLOW_SERVER_ENABLE_JOB_EXECUTION: 'false'
+      MLFLOW_SERVER_ALLOWED_HOSTS: 'mlflow:5000,localhost:5000,127.0.0.1:${TRIAL_PORT},localhost:${TRIAL_PORT}'
+    read_only: true
+    tmpfs: ['/tmp:size=256m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1.0
+    mem_limit: 1024m
+    pids_limit: 256
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 40
+      start_period: 30s
+  bootstrap:
+    <<: *job
+    command: [python, bootstrap.py]
+    secrets: [admin_password, user_a, user_b]
+  train:
+    <<: *job
+    command: [python, train.py]
+    secrets: [user_a]
+  access-check:
+    <<: *job
+    command: [python, access_check.py]
+    secrets: [admin_password, user_a, user_b]
+  verify:
+    <<: *job
+    command: [python, verify.py]
+    secrets: [user_a]
+    stdin_open: true
+
+networks:
+  ingress: {labels: *labels}
+  api: {internal: true, labels: *labels}
+  backend: {internal: true, labels: *labels}
+volumes:
+  database: {labels: *labels}
+  storage: {labels: *labels}
+secrets:
+  postgres_admin: {file: '${TRIAL_LOCAL:?}/secrets/postgres_admin'}
+  postgres_tracking: {file: '${TRIAL_LOCAL:?}/secrets/postgres_tracking'}
+  postgres_auth: {file: '${TRIAL_LOCAL:?}/secrets/postgres_auth'}
+  auth_config: {file: '${TRIAL_LOCAL:?}/secrets/auth_config'}
+  admin_password: {file: '${TRIAL_LOCAL:?}/secrets/admin_password'}
+  user_a: {file: '${TRIAL_LOCAL:?}/secrets/user_a'}
+  user_b: {file: '${TRIAL_LOCAL:?}/secrets/user_b'}
+  flask_key: {file: '${TRIAL_LOCAL:?}/secrets/flask_key'}
+  s3_access: {file: '${TRIAL_LOCAL:?}/secrets/s3_access'}
+  s3_secret: {file: '${TRIAL_LOCAL:?}/secrets/s3_secret'}
+  s3_config: {file: '${TRIAL_LOCAL:?}/secrets/s3_config'}
