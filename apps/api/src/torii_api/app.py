@@ -14,6 +14,7 @@ from torii_api.config import Settings
 from torii_api.domain.errors import DomainError
 from torii_api.http.middleware import EnvelopeMiddleware
 from torii_api.http.problems import problem
+from torii_api.security.credential_logging import configure_credential_logging
 from torii_api.storage.database import is_ready, make_engine
 
 
@@ -22,6 +23,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        # SPEC-0001 B2a4b: establish credential log policy before dependencies.
+        configure_credential_logging()
         engine = make_engine(config.database_url)
         app.state.engine = engine
         try:

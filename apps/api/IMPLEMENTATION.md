@@ -103,6 +103,23 @@ HTTP/session integration, login E2E or deployment is proved by these tests.
 B2a3 must implement the separately reviewed network boundary before B2b routes.
 Executed evidence and limitations: `docs/platform/sp-01-b2a2-evidence.md`.
 
+### B2a4b: credential transport and startup logging policy
+
+`security/oidc_exchange.py` composes the existing OAuth encoder/parser with a
+dedicated bounded POST client. It enforces fixed URLs, raw body/header limits,
+one work deadline, bounded cleanup, no redirects/proxy environment/cookies or
+automatic retry. Its `TokenReply` is still untrusted, not a completed login.
+
+`security/credential_logging.py` disables the exact HTTPX/HTTPCore emitter
+manifest at application startup, before dependencies. Version/source guards
+require review on upgrades; each POST refuses a broken policy before I/O.
+Other Torii logging remains active. This affects all HTTPX usage in the process;
+it does not protect the IdP, gateway, Uvicorn or arbitrary external instrumentation.
+
+No new routes, Settings, migration, DB writes or deployment. Scope and executed
+checks: `docs/platform/sp-01-b2a4b-evidence.md`; decision: `adr/0008`.
+Session orchestration and real OIDC/HTTP integration remain separate increments.
+
 ## Increment C: integrated journey
 
 Connect frontend and isolated Keycloak/DB stack, validate real multiple-user

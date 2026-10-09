@@ -21,8 +21,10 @@ przyjęty osobno po review. Code exchange/revocation wymagają B2a4; HTTP/login
 E2E i odbiór SP-01 nadal pozostają osobnymi bramkami.
 Dowody ograniczonego komponentu: [raport B2a3](../../docs/platform/sp-01-b2a3-evidence.md).
 Przyrost [B2a4a](increment-b2a4a.md): czyste komunikaty OAuth, bez I/O;
-[raport B2a4a](../../docs/platform/sp-01-b2a4a-evidence.md). Transport POST z
-polityką logowania i orchestration pozostają kolejnymi krokami, nie zaliczonym loginem.
+[raport B2a4a](../../docs/platform/sp-01-b2a4a-evidence.md).
+Przyrost [B2a4b](increment-b2a4b.md): ograniczony POST token/revocation i jawna
+polityka logowania procesu; [dowody](../../docs/platform/sp-01-b2a4b-evidence.md).
+Orkiestracja, HTTP i realne logowanie nadal wymagają własnych przyrostów.
 
 Wymagania: FR-01, FR-02, część FR-11/FR-12, NFR-01/04/07/08/09/10.
 ADR: [0001](../../adr/0001-platform-boundaries.md),

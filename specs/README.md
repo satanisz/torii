@@ -6,7 +6,7 @@ Powiązanie ze sprintami: [plan](../docs/platform/sprint-plan.md).
 
 | ID | Zakres | Stan dokumentu | Przygotować przed | Plan użycia |
 |---|---|---|---|---|
-| SPEC-0001 | Projekty, uprawnienia i wersje definicji | [Accepted (delegated) 0.3](0001-project-object-version/README.md) | SP-01 | SP-01–02 |
+| SPEC-0001 | Projekty, uprawnienia i wersje definicji | [Accepted (delegated) 0.4](0001-project-object-version/README.md) | SP-01 | SP-01–02 |
 | SPEC-0002 | Engineering baseline: repo, CI, konfiguracja, obrazy, migracje, testowe środowiska, observability | [Accepted (delegated) 0.2](0002-engineering-baseline/README.md) | SP-01 | SP-01–02, rozszerzenia później |
 | SPEC-0003 | Artefakty, CSV/Parquet, snapshoty i bezpieczny preview | Zarezerwowany; brak dokumentu | SP-03 | SP-03 |
 | SPEC-0004 | Izolowane wykonania, transformacje Python, próby i recovery | Zarezerwowany; brak dokumentu | SP-04 | SP-04 |

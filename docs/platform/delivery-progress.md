@@ -1,5 +1,27 @@
 # Dziennik realizacji Torii
 
+## SP01-04a — transport credentials i polityka logowania (2026-10-10)
+
+[B2a4b](../../specs/0001-project-object-version/increment-b2a4b.md) i
+[ADR-0008](../../adr/0008-credential-transport-logging.md) przyjęto po review
+przed kodem. Zaimplementowano ograniczony POST token/revocation i jawny startup
+polityki HTTPX/HTTPCore. TokenReply nadal nie potwierdza tożsamości ani sesji.
+Brak nowych tras, migracji i wdrożenia. [Dowody](sp-01-b2a4b-evidence.md).
+
+Review odtworzył i zamknął P2: deadline musi być sprawdzony tuż przed send,
+również po synchronicznym przygotowaniu. Pełna regresja po naprawie i osobnej
+aktualizacji bezpieczeństwa PyJWT2.15.1 (`45f9eef`): **1565 unit PASS,53 PG deselected**,
+Ruff/format63, strict mypy32 i kontrakty PASS. Nowych158 testów B2a4b oraz7
+regresji zależności. pip-audit nie zgłasza znanych podatności runtime.
+PostgreSQL/UI nie testowano ponownie w tym przyroście bez zmian ich kodu;
+następna kompozycja z DB wymaga rzeczywistych testów transakcji.
+
+Następny SP01-04b to orkiestracja trwałego flow, podpisów i sesji. SP-01 nadal
+In progress; HTTP/CSRF/Bearer, bootstrap, rzeczywisty IdP/UI, restore, limiter,
+metryki/retencja i pozostałe bramki operacyjne pozostają do wykonania.
+Nowy warsztat modeli jest w commicie `92692e6` i pozostaje odseparowaną próbą.
+Commity lokalne; bez push lub zmiany legacy.
+
 ## Warsztat tworzenia modeli — SPEC-0020 / EXP-03a (2026-10-10)
 
 Użytkownik włączył Docker, zlecił skupienie na architekturze narzędzi modeli,
