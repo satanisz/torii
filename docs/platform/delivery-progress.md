@@ -1,6 +1,55 @@
 # Dziennik realizacji Torii
 
-## Aktualny priorytet — demonstrator SPEC-0018 (2026-09-19)
+## Aktualny priorytet planowania — platforma obiektów i graf 2026-10-10
+
+Użytkownik ocenił Torii jako zbyt dashboardowe i zlecił plan architektury
+enterprise z obiektami danych, transformacji i eksperymentów. Potwierdził,
+że „edge technology” oznacza nowoczesny stos i graf zależności. Finanse banku
+pozostają zastosowaniem platformy, nie osobnym rdzeniem produktu.
+
+Powstały [architektura obiektów](enterprise-object-platform.md),
+[plan sprintów 0.2](sprint-plan.md), [ADR-0006 Proposed](../../adr/0006-object-catalog-and-lineage.md)
+i doprecyzowane karty SP-01/02/03. Zachowano ID istniejącego backlogu.
+Graf referencji przesunięto do SP-02, provenance wykonania do SP-04, a SP-10
+rozbito planistycznie na wąskie eksperymenty A i późniejszy pełny rejestr B.
+
+Odczyt kodu potwierdził komponenty projektów/tożsamości i dwie trasy health
+w enterprise API; pełne auth i katalog nadal wymagają implementacji.
+Punkt wznowienia SP-01 to brakujące B2a4b i dalsza integracja, bez przepisywania
+przyjętych komponentów. Nowe kontrakty grafu i eksperymentów nie otrzymały
+Accepted. Zlecenie planowania nie wznowiło kodowania, usług ani automatyzacji.
+Dokumenty nie zmieniają dotychczasowego odbioru demo ani statusów enterprise.
+
+Kontrola planu: 12 dokumentów, 82 lokalne odnośniki, komplet 12 FR i 10 NFR,
+16 unikatowych przyrostów zachowujących SP-01–15 oraz unikatowe ID zadań kart
+SP-01/02/03 — PASS. `git diff --check` PASS. Niezależne przeglądy techniczne
+direction_review i regulated_examples zakończone bez blokujących uwag po
+doprecyzowaniu restore od pierwszych przyrostów, grafu importu, widoczności
+uciętego podgrafu oraz różnicy między przekazanym wejściem a obserwacją odczytu.
+To weryfikacja dokumentacji; nie wykonano nowych testów produktu.
+
+## Poprzedni przyrost — finanse banku SPEC-0019 (2026-10-09)
+
+Nowa dyspozycja użytkownika: zebrać wzorce gotowych platform i zbudować
+konkretny proces finansowy obejmujący księgę, portfele, NII, prognozy wyniku
+i anomalie. [Porównanie platform i kierunek](banking-finance-research.md)
+oraz [ADR-0005](../../adr/0005-bank-finance-workbench.md) wskazują wersjonowaną
+analizę finansową jako centrum produktu.
+
+Pierwszy lokalny przyrost [SPEC-0019](../../specs/0019-bank-finance-lab/README.md)
+jest zaimplementowany i zweryfikowany: syntetyczny GL/portfel, uzgodnienie,
+12 miesięcy NII, scenariusz stóp/beta, regułowe anomalie, historia i eksport.
+Nowa zakładka Finanse banku w istniejącym demo, osobny silnik i magazyn wyników.
+141 testów backendu i 76 frontend PASS; lint/types/build PASS; niezależny
+review oraz prawdziwy browser/restart PASS. [Dokładne dowody](../../specs/0019-bank-finance-lab/evidence.md).
+
+Demo na `http://127.0.0.1:18440/?view=finance`,
+[instrukcja](../banking-finance-lab.md). Zmiany lokalne, bez push.
+Nie jest to silnik produkcyjny ALM, prognoza pełnego P&L ani ukończenie SP-01–15.
+Następny krok to dopasowanie kontraktu danych i metodyki do jednej rzeczywistej
+analizy finansowej; nie automatyczna realizacja wszystkich dalszych zakresów.
+
+## Poprzedni priorytet — demonstrator SPEC-0018 (2026-09-19)
 
 Nowa dyspozycja użytkownika zastępuje najbliższy krok B2a4b: doprowadzić
 do ręcznie testowalnej aplikacji prezentującej koncept, nawet z mniejszym

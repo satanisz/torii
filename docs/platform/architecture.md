@@ -3,6 +3,12 @@
 Status: Draft. To projekt granic, nie dokumentacja wdrożonego backendu.
 Architekturę istniejących obrazów opisuje [starszy dokument](../architecture.md).
 
+Kierunek 2026-10-10: [platforma obiektów i pochodzenia](enterprise-object-platform.md)
+uszczegóławia katalog, trzy rodzaje grafu, protokół eksperymentu i adaptery.
+[ADR-0006](../../adr/0006-object-catalog-and-lineage.md) pozostaje Proposed.
+Dagster jest pierwszym kandydatem próby runtime; wynik poprzedza wybór
+implementacyjny. Kolejność określa [plan sprintów 0.2](sprint-plan.md).
+
 ## Podejście
 
 Pozostajemy w repozytorium Torii. Proponujemy **modularny monolit sterowania**
@@ -24,7 +30,7 @@ w swoim procesie, także przy podglądzie metadanych lub walidacji.
 | Baza platformy | Tożsamości lokalne, grants, wersje, wykonania, approvals, outbox | PostgreSQL, osobna baza/rola od MLflow |
 | Uwierzytelnianie | Zewnętrzna tożsamość, sesje i konta usługowe | OIDC, lokalny testowy IdP; firmowy dostawca później |
 | Artifact store | Snapshoty, pakiety modeli, raporty i paczki źródeł | Interfejs S3; MinIO do dev, firmowy magazyn po weryfikacji |
-| Execution adapter | Dispatch, próby, heartbeat, cancel, reconcile | Decyzja po próbie Dagster kontra prosty runner zadaniowy |
+| Execution adapter | Dispatch, mapowanie prób, heartbeat, cancel, reconcile | Dagster jako pierwszy kandydat próby; Torii kontroluje publikację, bez równoległego własnego schedulera DAG |
 | Worker | Izolowane wykonanie konkretnego planu | Kontener per zadanie; Docker dev, docelowy scheduler firmy |
 | MLflow adapter | Tracking, metryki i kompatybilne modele | Obecny MLflow za kontrolowaną granicą dostępu |
 | Catalog adapter | Projekcja katalogu i lineage | DataHub opcjonalny; nie wymagany dla transakcji Torii |

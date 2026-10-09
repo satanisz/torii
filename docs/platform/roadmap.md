@@ -3,9 +3,26 @@
 Status: Draft. Etapy oznaczają zależności i dowody, nie obietnicę terminu.
 Estymacja nastąpi po kontraktach pierwszego przyrostu i próbach technicznych.
 
+Korekta 2026-10-10: priorytetem planu jest [platforma obiektów i graf zależności](enterprise-object-platform.md).
+Obowiązuje proponowana kolejność w [planie sprintów 0.2](sprint-plan.md):
+katalog/graf wcześniej, ograniczone eksperymenty przed pełnym Git/Jupyter.
+S0–S6 poniżej to zakresy zdolności produktu, nie wymóg ukończenia całego S3
+przed pierwszym przyrostem S4. Laboratorium finansowe pozostaje referencją
+jednego procesu, bez dalszej rozbudowy dashboardów w ramach tego planu.
+
 Rozpisanie na przyrosty infrastruktury, backendu i frontendu zawiera
 [plan sprintów](sprint-plan.md). S0–S6 to etapy produktu, a SP-00–15 to
 prognozowane cele iteracji; nie są to dwa równoległe harmonogramy.
+
+[Notatka kierunkowa z 2026-10-09](ml-ai-platform-direction.md) proponuje
+wyraźniejsze ukierunkowanie na platformę ML i AI oraz pełny cykl eksploatacji.
+Uzupełnia plan; nie zmienia statusów etapów ani zatwierdzonego zakresu.
+
+Po doprecyzowaniu potrzeb użytkownika pierwszy proces dotyczy **finansów banku**:
+księgi głównej, portfeli, NII, prognoz wyniku i anomalii. Konkretne wybory
+oraz porównanie produktów opisuje [warsztat finansowy](banking-finance-research.md).
+[SPEC-0019](../../specs/0019-bank-finance-lab/README.md) obejmuje pierwszy lokalny
+przyrost na danych syntetycznych; nie zalicza niżej opisanych etapów enterprise.
 
 ## Etapy
 

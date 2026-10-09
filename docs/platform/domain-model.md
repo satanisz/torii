@@ -4,6 +4,12 @@ Status: Draft; pojęcia i inwarianty do akceptacji przed schematem bazy/API.
 Powiązane: [ADR-0002](../../adr/0002-git-and-authority.md),
 [ADR-0003](../../adr/0003-reproducibility-and-releases.md).
 
+Uszczegółowienie z 2026-10-10: [architektura obiektów](enterprise-object-platform.md)
+rozdziela graf referencji, pochodzenie wykonania i plan Flow. Proponuje
+ExperimentVersion dla protokołu oceny w SPEC-0010. Wiersz Experiment poniżej
+nie oznacza wdrożonego wersjonowania protokołu; rozszerzenie wymaga kontraktu
+i przeglądu przed implementacją.
+
 ## Trzy różne tożsamości
 
 **Obiekt** ma trwałe ID, typ, projekt, nazwę, właściciela i politykę dostępu.
