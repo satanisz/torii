@@ -22,6 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from torii_demo.data import parse_csv, synthetic_data, transform
+from torii_demo.finance_api import register_finance
 from torii_demo.store import NotFound, Store, encode
 
 REPO = Path(__file__).resolve().parents[4]
@@ -148,6 +149,7 @@ def create_app(data_dir: Path, web_dir: Path | None = None):
     @asynccontextmanager
     async def lifespan(app):
         store.recover()
+        recover_finance()
         yield
         pool.shutdown(wait=True)
 
@@ -161,6 +163,7 @@ def create_app(data_dir: Path, web_dir: Path | None = None):
     )
     app.add_middleware(DemoGuard)
     app.state.store = store
+    recover_finance = register_finance(app, store, gate, pool)
 
     @app.exception_handler(NotFound)
     async def not_found(request, exc):
@@ -184,7 +187,7 @@ def create_app(data_dir: Path, web_dir: Path | None = None):
 
     @app.get("/demo-api/state")
     def state():
-        return store.state()
+        return store.state() | {"execution_active": gate.locked()}
 
     @app.post("/demo-api/projects", status_code=201)
     def projects(body: Named):

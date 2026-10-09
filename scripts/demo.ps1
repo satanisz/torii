@@ -36,8 +36,8 @@ if ($Action -eq 'Status') {
 }
 if ($Action -eq 'Stop') {
     $toriiState = Get-DemoState
-    if ($toriiState.runs | Where-Object { $_.status -in @('queued', 'running') }) {
-        throw 'Demo training is still active. Wait for the run to finish before stopping.'
+    if ($toriiState.execution_active -or ($toriiState.runs | Where-Object { $_.status -in @('queued', 'running') })) {
+        throw 'A demo execution is still active. Wait for the run to finish before stopping.'
     }
     if (-not (Test-Path -LiteralPath $toriiPidFile)) { throw 'No owned demo process record.' }
     $toriiRecord = Get-Content -LiteralPath $toriiPidFile -Raw | ConvertFrom-Json

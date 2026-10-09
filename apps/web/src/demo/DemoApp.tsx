@@ -3,22 +3,24 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { demoRequest } from './api';
 import { Data } from './Data';
 import { Experiments } from './Experiments';
+import { Finance } from './Finance';
 import { Models } from './Models';
 import { Transforms } from './Transforms';
 import { Field, label, refs } from './ui';
 import type { DemoState, Mutation, Project } from './types';
 
-type Tab = 'data' | 'transforms' | 'models' | 'experiments';
+type Tab = 'data' | 'transforms' | 'models' | 'experiments' | 'finance';
 const tabs: { id: Tab; title: string; step: string }[] = [
   { id: 'data', title: 'Dane', step: '01' }, { id: 'transforms', title: 'Transformacje', step: '02' },
   { id: 'models', title: 'Modele', step: '03' }, { id: 'experiments', title: 'Eksperymenty', step: '04' },
+  { id: 'finance', title: 'Finanse banku', step: '05' },
 ];
 
 export function DemoApp() {
   const [state, setState] = useState<DemoState | null>(null);
-  const [projectId, setProjectId] = useState('');
+  const [projectId, setProjectId] = useState(() => new URLSearchParams(window.location.search).get('project') ?? '');
   const [versionId, setVersionId] = useState('');
-  const [tab, setTab] = useState<Tab>('data');
+  const [tab, setTab] = useState<Tab>(() => new URLSearchParams(window.location.search).get('view') === 'finance' ? 'finance' : 'data');
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -98,15 +100,16 @@ export function DemoApp() {
         {notice && <div className="notice success" role="status">{notice}</div>}
         {busy && <div className="demo-saving" role="status"><span className="demo-spinner" aria-hidden="true" /> Zapisuję i odświeżam…</div>}
         {!state ? <div className="demo-empty"><h1>Twój workspace</h1><p>{error ? 'Połączenie wymaga uwagi. Uruchom lokalny demonstrator i odśwież.' : 'Wczytuję projekty i obiekty…'}</p></div> : !project ? <section className="demo-welcome"><p className="eyebrow">Torii · warsztat danych i modeli</p><h1>Od danych<br />do decyzji.</h1><p>Zobacz cały proces w jednym miejscu: wersje danych, przepisy transformacji, modele i mierzalne wyniki.</p><div className="demo-welcome-flow" aria-label="Kroki demonstratora">{tabs.map(item => <div key={item.id}><span>{item.step}</span><strong>{item.title}</strong></div>)}</div><p className="hint">Utwórz projekt w panelu po lewej. Pierwszy eksperyment możesz wykonać na danych syntetycznych — bez konfiguracji połączeń.</p><div className="demo-scope"><strong>Co pokazuje ten koncept?</strong><p>Niezmienne wersje i ich pochodzenie, deklaratywne transformacje, regresję Ridge, baseline oraz rzeczywiste śledzenie MLflow.</p><p>SSO, współdzielenie, SQL/Parquet, Jupyter, pełne XAI i wdrożenia produkcyjne są poza tą demonstracją.</p></div></section> : <>
-          <section className="demo-heading"><div><p className="eyebrow">Projekt / laboratorium</p><h1>{project.name}</h1><p>Buduj, porównuj i wracaj do źródła każdego wyniku.</p></div><a className="button demo-secondary" href={`/demo-api/projects/${project.id}/export`} download>Eksport projektu <span aria-hidden="true">↓</span></a></section>
-          <div className="demo-summary"><span><strong>{objects.filter(object => object.kind === 'dataset').length}</strong> zbiory danych</span><span><strong>{transforms.length}</strong> transformacje</span><span><strong>{models.length}</strong> modele</span><span><strong>{runs.length}</strong> eksperymenty</span><span><strong>{analyses.length}</strong> analizy</span></div>
+          <section className="demo-heading"><div><p className="eyebrow">Projekt / laboratorium</p><h1>{project.name}</h1><p>Buduj, porównuj i wracaj do źródła każdego wyniku.</p></div><a className="button demo-secondary" href={`/demo-api/projects/${project.id}/export`} download>{tab === 'finance' ? 'Eksport części ML' : 'Eksport projektu'} <span aria-hidden="true">↓</span></a></section>
+          <div className="demo-summary"><span><strong>{objects.filter(object => object.kind === 'dataset').length}</strong> zbiory danych</span><span><strong>{transforms.length}</strong> transformacje</span><span><strong>{models.length}</strong> modele</span><span><strong>{runs.length}</strong> eksperymenty</span><span><strong>{analyses.length}</strong> {tab === 'finance' ? 'analizy ML' : 'analizy'}</span></div>
           <nav className="demo-tabs" aria-label="Etapy projektu">{tabs.map(item => <button key={item.id} onClick={() => { setTab(item.id); }} aria-current={tab === item.id ? 'step' : undefined} className={tab === item.id ? 'active' : ''}><span>{item.step}</span>{item.title}{item.id === 'experiments' && activeRun && <i className="demo-local-dot" aria-label="Trwa wykonanie" />}</button>)}</nav>
-          <div className="demo-version-bar"><div><span className="demo-chip">SNAPSHOT</span><span className="hint">Pracujesz na konkretnej wersji</span></div><Field title="Wersja danych"><select value={selected?.version.id ?? ''} disabled={busy || !datasets.length} onChange={event => { setVersionId(event.target.value); }}><option value="" disabled>Dodaj zbiór danych</option>{datasets.map(ref => <option key={ref.version.id} value={ref.version.id}>{label(ref)} · {ref.version.summary.row_count ?? 0} wierszy</option>)}</select></Field></div>
+          {tab !== 'finance' && <div className="demo-version-bar"><div><span className="demo-chip">SNAPSHOT</span><span className="hint">Pracujesz na konkretnej wersji</span></div><Field title="Wersja danych"><select value={selected?.version.id ?? ''} disabled={busy || !datasets.length} onChange={event => { setVersionId(event.target.value); }}><option value="" disabled>Dodaj zbiór danych</option>{datasets.map(ref => <option key={ref.version.id} value={ref.version.id}>{label(ref)} · {ref.version.summary.row_count ?? 0} wierszy</option>)}</select></Field></div>}
           {tab === 'data' && <Data key={project.id} projectId={project.id} datasets={datasets} selected={selected} busy={busy} mutate={mutate} select={selectDataset} allVersions={[...datasets, ...transforms]} />}
           {tab === 'transforms' && <Transforms key={`${project.id}:${selected?.version.id ?? ''}`} projectId={project.id} selected={selected} transforms={transforms} datasets={datasets} busy={busy} mutate={mutate} select={selectDataset} />}
           {tab === 'models' && <Models key={`${project.id}:${selected?.version.id ?? ''}`} projectId={project.id} selected={selected} models={models} busy={busy} mutate={mutate} experiment={() => { setTab('experiments'); }} />}
           {tab === 'experiments' && <Experiments key={project.id} projectId={project.id} selected={selected} models={models} datasets={datasets} runs={runs} analyses={analyses} activeRun={activeRun} busy={busy} mutate={mutate} selectDataset={selectDataset} />}
-          <footer className="demo-footer"><span>TORII · lokalny koncept</span><p>Eksport projektu: definicje, hashe, metryki i środowisko — bez danych oraz artefaktów modelu. Nie jest pełnym pakietem odtworzeniowym.</p></footer>
+          {tab === 'finance' && <Finance key={project.id} projectId={project.id} />}
+          <footer className="demo-footer"><span>TORII · lokalny koncept</span><p>{tab === 'finance' ? 'Finanse banku: osobna historia analiz. Eksport analizy zawiera syntetyczne wejścia, scenariusz, wynik i wersję metody.' : 'Eksport projektu: definicje, hashe, metryki i środowisko — bez danych oraz artefaktów modelu. Nie jest pełnym pakietem odtworzeniowym.'}</p></footer>
         </>}
       </main>
     </div>

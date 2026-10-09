@@ -96,4 +96,24 @@ Set-TestListener 101 999
 Assert-Case ((Record-DemoListener) -eq $true) 'The directly launched listener must be accepted.'
 Assert-Recorded 101
 
-Write-Host 'PASS: 4 demo launcher ownership cases; no real HTTP, processes, or file writes.'
+# SPEC-0019 F05: stopping must also refuse an active financial calculation.
+$toriiStopGuard = $toriiAst.Find({
+    param($node)
+    $node -is [System.Management.Automation.Language.IfStatementAst] -and
+        $node.Clauses[0].Item1.Extent.Text -match '^\$toriiState\.execution_active'
+}, $true)
+Assert-Case ($null -ne $toriiStopGuard) 'Financial execution stop guard is missing.'
+foreach ($toriiStopCase in @(
+    @{ Active = $true; Runs = @(); Refused = $true },
+    @{ Active = $false; Runs = @([pscustomobject]@{ status = 'running' }); Refused = $true },
+    @{ Active = $false; Runs = @([pscustomobject]@{ status = 'queued' }); Refused = $true },
+    @{ Active = $false; Runs = @([pscustomobject]@{ status = 'succeeded' }); Refused = $false }
+)) {
+    $toriiState = [pscustomobject]@{ execution_active = $toriiStopCase.Active; runs = $toriiStopCase.Runs }
+    $toriiStopRefused = $false
+    try { & ([scriptblock]::Create($toriiStopGuard.Extent.Text)) }
+    catch { $toriiStopRefused = $true }
+    Assert-Case ($toriiStopRefused -eq $toriiStopCase.Refused) 'Execution stop guard returned the wrong decision.'
+}
+
+Write-Host 'PASS: 4 launcher ownership cases and 4 execution stop guards; no real HTTP, processes, or file writes.'
