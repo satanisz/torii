@@ -1,5 +1,32 @@
 # Dziennik realizacji Torii
 
+## SP01-04b — orkiestracja trwałego flow i sesji (2026-10-10)
+
+Po commicie transportu `d63bee6` przyjęto osobno
+[B2a4c](../../specs/0001-project-object-version/increment-b2a4c.md) i
+[ADR-0009](../../adr/0009-oidc-db-cancellation.md), z niezależnym review przed kodem.
+Wewnętrzny serwis składa start, callback i logout: commit flow przed HTTP,
+oba podpisy/nonce/sub przed zapisem sesji, lokalny DELETE przed remote revoke.
+Nie dodaje grantów, HTTP routes, migracji ani wdrożenia. [Pełne dowody](sp-01-b2a4c-evidence.md).
+
+Worker DB jest śledzony i synchronizowany po anulowaniu; znana późna sesja ma
+jedną próbę usunięcia. Commit-unknown pozostaje jawny, bez zwrócenia credential
+i bez udawania rollback. Sync join może przekroczyć15s, co B2b musi uwzględnić
+przy połączeniu z middleware. Nie jest to jeszcze logowanie przeglądarki.
+
+Końcowo **1642 unit PASS +79 real PostgreSQL PASS** (26 nowych+53 regresji),
+Ruff/format66, strict mypy33 i kontrakty PASS. Nowych77 unit/async A4c.
+Review znalazł i testem RED→GREEN zamknął wyciek context surowego wyjątku
+przy cancellation pomocniczego revoke. Po poprawce powtórzono26 PG PASS.
+Każdy run używał nowych tymczasowych zasobów z potwierdzonym cleanup;
+legacy, trwałe dane i uruchomiony warsztat modeli pozostały nienaruszone.
+
+Następny punkt planu: **SP01-04c/B2b** — kontrakt i implementacja HTTP,
+session/Bearer auth, cookie/Origin/CSRF, chronione projekty i integracja UI.
+Przed realnym loginem obowiązuje polityka logów IdP/gateway oraz bezpieczny
+bootstrap. SP-01 nadal In progress; katalog/graf SP-02 i dalsze narzędzia
+modeli nie uzyskują statusu gotowych na podstawie tego przyrostu.
+
 ## SP01-04a — transport credentials i polityka logowania (2026-10-10)
 
 [B2a4b](../../specs/0001-project-object-version/increment-b2a4b.md) i

@@ -118,7 +118,25 @@ it does not protect the IdP, gateway, Uvicorn or arbitrary external instrumentat
 
 No new routes, Settings, migration, DB writes or deployment. Scope and executed
 checks: `docs/platform/sp-01-b2a4b-evidence.md`; decision: `adr/0008`.
-Session orchestration and real OIDC/HTTP integration remain separate increments.
+Session orchestration is described below; real OIDC/HTTP integration is still separate.
+
+### B2a4c: internal login/session orchestration
+
+`application/oidc_login.py` composes the existing durable store, key cache,
+JWT verifier and credential transport. A consumed flow commits before HTTP;
+only fully verified tokens can create a session. Local logout commits before
+best-effort remote revocation. There are no new HTTP routes or permission grants.
+
+Whole synchronous DB operations run off the event loop with at most four
+submitted workers per service. Cancellation joins owned work, compensates a
+known late session once, and reports uncertain commit outcomes conservatively.
+Client shutdown drains operations first; the caller still owns the engine.
+DB join may exceed the cooperative network budget. HTTP middleware integration
+must address that limitation before B2b can claim request timeout behavior.
+
+Tests use ephemeral PostgreSQL and real signatures with a controlled provider;
+they do not qualify actual Keycloak login or browser security. Executed evidence:
+`docs/platform/sp-01-b2a4c-evidence.md`; decision: `adr/0009`.
 
 ## Increment C: integrated journey
 

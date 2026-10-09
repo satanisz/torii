@@ -24,7 +24,9 @@ Przyrost [B2a4a](increment-b2a4a.md): czyste komunikaty OAuth, bez I/O;
 [raport B2a4a](../../docs/platform/sp-01-b2a4a-evidence.md).
 Przyrost [B2a4b](increment-b2a4b.md): ograniczony POST token/revocation i jawna
 polityka logowania procesu; [dowody](../../docs/platform/sp-01-b2a4b-evidence.md).
-Orkiestracja, HTTP i realne logowanie nadal wymagają własnych przyrostów.
+Przyrost [B2a4c](increment-b2a4c.md) składa trwały flow, JWT i sesje wewnątrz
+serwisu; [dowody](../../docs/platform/sp-01-b2a4c-evidence.md) rozróżniają real PG
+od kontrolowanego IdP. HTTP i realne logowanie przeglądarki pozostają B2b.
 
 Wymagania: FR-01, FR-02, część FR-11/FR-12, NFR-01/04/07/08/09/10.
 ADR: [0001](../../adr/0001-platform-boundaries.md),

@@ -21,12 +21,13 @@ testów lub usług podczas aktualizacji planu:
 - Istnieją trwałe serwisy projektów, członkostw, polityk, audytu i idempotencji
   oraz migracja PostgreSQL. B1 ma zapisane dowody rzeczywistych transakcji;
   nie powtarzamy jego implementacji w kolejnym przyroście.
-- B2a1–B2a4b dostarczyły stan sesji/flow, JWT/JWKS, transport discovery/cache,
+- B2a1–B2a4c dostarczyły stan sesji/flow, JWT/JWKS, transport discovery/cache,
   komunikaty OAuth oraz ograniczony POST i politykę logowania procesu.
   [Dowód B2a4b](../sp-01-b2a4b-evidence.md) obejmuje komponent z kontrolowanym
   transportem, nie realne logowanie. [B2](../../../specs/0001-project-object-version/increment-b2.md)
-  pozostaje Proposed poza osobno przyjętymi fragmentami; następna jest
-  orkiestracja SP01-04b, potem HTTP i rzeczywisty IdP w B2b.
+  pozostaje Proposed poza osobno przyjętymi fragmentami.
+  [Orkiestracja SP01-04b](../sp-01-b2a4c-evidence.md) składa te komponenty
+  z rzeczywistą bazą; HTTP i rzeczywisty IdP nadal należą do B2b.
 - [Frontend enterprise](../../../apps/web/README.md) ma powłokę, projekty,
   dostęp i audyt oraz rzeczywisty klient HTTP. Czeka na podłączenie backendu;
   testy z odpowiedziami mockowanymi nie zaliczają integracji.
@@ -46,7 +47,7 @@ Status „częściowo” nie jest odbiorem zadania ani całej specyfikacji.
 | SP01-01 | I/Q | Częściowo | Locki, lint/types, kontrakty, testy i CI istnieją; domknąć powtarzalny build oraz wymagane skany/SBOM/licencje | SPEC-0002; dowody dla ocenianego commita, nie sam plik workflow |
 | SP01-02 | I | Częściowo | Izolowane DB/IdP/API/web/gateway i role istnieją; domknąć pełny start/bootstrap/E2E oraz instrukcję nowej instancji | SPEC-0002; start/readiness/stop i izolacja od starych zasobów |
 | SP01-03 | B/Q | Implementacja podstaw z dowodami B1/B2a1; odbiór otwarty | Zachować migrację, serwisy i fixtures; potwierdzić restart/restore oraz użycie przez chronione HTTP | SPEC-0001 AC-01/12/15 w zakresie projektów |
-| SP01-04 | B/Q | Częściowo | Zachować B1 i B2a1–B2a4b; dokończyć orkiestrację, uwierzytelnianie i trasy projektów | SPEC-0001 AC-01/03/09/10/14; B2-AC01–06 w odpowiednim zakresie |
+| SP01-04 | B/Q | Częściowo | Zachować B1 i B2a1–B2a4c; dokończyć uwierzytelnianie HTTP i trasy projektów | SPEC-0001 AC-01/03/09/10/14; B2-AC01–06 w odpowiednim zakresie |
 | SP01-05 | F | Implementacja powłoki z testami; odbiór otwarty | Zachować komponenty i formularze; sprawdzić focus, komunikaty i dostępność w rzeczywistym przepływie | SPEC-0017; testy UI nie zastępują odbioru z API |
 | SP01-06 | F/B | Klient UI gotowy do integracji | Podłączyć login/logout, sesję, projekty, politykę dostępu i audyt do rzeczywistego backendu | SPEC-0001 AC-13; brak hardcoded użytkownika i obejść auth |
 | SP01-07 | I/B/Q | Częściowo | Request ID, health/readiness i część redakcji istnieją; domknąć metryki/retencję, limiter, restart i restore | SPEC-0002 oraz SPEC-0001 AC-12/15; osobny dowód restore |
@@ -60,7 +61,7 @@ Accepted nowym decyzjom transportu, orkiestracji ani kontraktom HTTP.
 | ID | Zakres do wykonania | Zależność | Dowód odbioru |
 |---|---|---|---|
 | SP01-04a | B2a4b: zaimplementowany ograniczony POST wymiany kodu i revocation oraz polityka logowania procesu | Istniejące B2a3/B2a4a | [Raport komponentu](../sp-01-b2a4b-evidence.md): fixed URL, brak retry/redirect/proxy env, limity i redakcja; bez realnego loginu |
-| SP01-04b | Osobny kontrakt orkiestracji: consume-flow commit przed siecią, sprawdzenie podpisów/nonce/at_hash/sub, utworzenie sesji i best-effort revoke | SP01-04a oraz istniejące B2a1/B2a2 | Callback zużyty raz przy wyścigu; błąd sieci/walidacji/commit nie tworzy fałszywie poprawnej sesji; brak blokad DB podczas HTTP |
+| SP01-04b | B2a4c: zaimplementowana wewnętrzna orkiestracja flow, tokenów, sesji i best-effort revoke | SP01-04a oraz istniejące B2a1/B2a2 | [Raport](../sp-01-b2a4c-evidence.md): real PG, callback zużyty raz, brak sesji po złym JWT, join/kompensacja i jawne commit-unknown; bez HTTP/UI |
 | SP01-04c | B2b: middleware tożsamości, cookie/CSRF/Origin, login/callback/session/logout, chronione trasy projektów/polityk/memberships/audytu | SP01-04b; review części HTTP B2 | Macierz ról, cofnięcie praw, ETag/idempotencja i błędy zgodne z B1/OpenAPI; brak zaufania do actor z payloadu |
 | SP01-06a | Powtarzalny bootstrap syntetycznej organizacji i uprawnienia create; integracja istniejącego UI z trasami | SP01-04c; SP01-02/05 | Sam login nie przyznaje grantów; nowy izolowany stos obsługuje A/B/E, create, edycję polityki i audyt bez ręcznej zmiany DB |
 | SP01-07a | Domknięcie limitera, logów/metryk o ograniczonej liczbie etykiet, retencji oraz restart/backup/restore | Kontrakty SP01-04c; istniejący profil dev/test | Weryfikacja sekretów w dowodach; restore do nowej bazy zachowuje ID/grants/audyt; restart nie zastępuje restore |
